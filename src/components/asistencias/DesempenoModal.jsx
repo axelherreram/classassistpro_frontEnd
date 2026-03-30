@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Trophy, Medal, Star, Target, TrendingUp, AlertCircle, RefreshCw, Download } from 'lucide-react';
 import { desempenoService } from '../../services/desempeno.service';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 
 const DesempenoModal = ({ isOpen, onClose, sesionId, claseId }) => {
   const [loading, setLoading] = useState(false);
@@ -33,27 +33,51 @@ const DesempenoModal = ({ isOpen, onClose, sesionId, claseId }) => {
     }
   };
 
-  const exportarExcel = () => {
+  const exportarExcel = async () => {
     if (!data || !data.ranking || data.ranking.length === 0) return;
 
-    const datosExportar = data.ranking.map((row, index) => ({
-      Rank: index + 1,
-      Carnet: row.estudiante.carnet,
-      Nombre: row.estudiante.nombre,
-      Asistencias: row.detalles.asistencias,
-      'Puntos Asistencia': row.detalles.puntosAsistencia,
-      Participaciones: row.detalles.participaciones,
-      'Puntos Participacion': row.detalles.puntosParticipacion,
-      'Puntaje Total': row.puntajeTotal
-    }));
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Desempeño y Asistencia');
 
-    const hoja = XLSX.utils.json_to_sheet(datosExportar);
-    const libro = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(libro, hoja, 'Desempeño y Asistencia');
+    worksheet.columns = [
+      { header: 'Rank', key: 'Rank', width: 10 },
+      { header: 'Carnet', key: 'Carnet', width: 15 },
+      { header: 'Nombre', key: 'Nombre', width: 30 },
+      { header: 'Asistencias', key: 'Asistencias', width: 15 },
+      { header: 'Puntos Asistencia', key: 'Puntos Asistencia', width: 20 },
+      { header: 'Participaciones', key: 'Participaciones', width: 15 },
+      { header: 'Puntos Participacion', key: 'Puntos Participacion', width: 20 },
+      { header: 'Puntaje Total', key: 'Puntaje Total', width: 15 }
+    ];
 
+    data.ranking.forEach((row, index) => {
+      worksheet.addRow({
+        Rank: index + 1,
+        Carnet: row.estudiante.carnet,
+        Nombre: row.estudiante.nombre,
+        Asistencias: row.detalles.asistencias,
+        'Puntos Asistencia': row.detalles.puntosAsistencia,
+        Participaciones: row.detalles.participaciones,
+        'Puntos Participacion': row.detalles.puntosParticipacion,
+        'Puntaje Total': row.puntajeTotal
+      });
+    });
+
+    // Save file
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    
     const prefijo = claseId ? 'General' : 'Sesion';
     const nombreArchivo = `Desempeño_${prefijo}_${data.clase || 'Clase'}_${new Date().toISOString().split('T')[0]}.xlsx`;
-    XLSX.writeFile(libro, nombreArchivo);
+
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = nombreArchivo;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
   };
 
   if (!isOpen) return null;
