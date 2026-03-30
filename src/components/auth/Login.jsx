@@ -42,8 +42,15 @@ const Login = () => {
       }
       
       toast.success('¡Bienvenido a ClassAssist!');
-      // Redirigir al dashboard
-      navigate('/dashboard');
+      
+      // Verificar si necesita forzar la actualización de contraseña/perfil
+      if (data && data.actualizoContra === false) {
+        toast.error('Por seguridad, debes cambiar tu correo o contraseña por defecto.');
+        navigate('/dashboard/perfil', { state: { forceUpdate: true } });
+      } else {
+        // Redirigir al dashboard
+        navigate('/dashboard');
+      }
       
     } catch (err) {
       toast.error(err.message);

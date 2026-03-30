@@ -31,7 +31,7 @@ export default function Header({ toggleSidebar }) {
         <Menu className="w-5 h-5" />
       </button>
       
-      <div className="relative" ref={dropdownRef}>
+      <div className="relative" ref={dropdownRef} id="tour-profile">
         <button 
           onClick={() => setIsOpen(!isOpen)}
           className="flex items-center gap-3 pl-2 pr-1 py-1 rounded-full hover:bg-gray-50 transition-colors"
@@ -53,11 +53,10 @@ export default function Header({ toggleSidebar }) {
             </div>
             
             <div className="p-1.5">
-              <button className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 rounded-xl flex items-center gap-3 transition-colors">
+              <button 
+                onClick={() => { setIsOpen(false); navigate('/dashboard/perfil'); }}
+                className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 rounded-xl flex items-center gap-3 transition-colors">
                 <User className="w-4 h-4 text-gray-400" /> Mi Cuenta
-              </button>
-              <button className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 rounded-xl flex items-center gap-3 transition-colors">
-                <Settings className="w-4 h-4 text-gray-400" /> Configuración
               </button>
             </div>
             

@@ -1,13 +1,72 @@
 import { BookOpen, Users, Home, Calendar, LayoutDashboard } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
+import { driver } from 'driver.js';
+import 'driver.js/dist/driver.css';
 
 export default function Sidebar({ isOpen }) {
   const menuItems = [
-    { icon: LayoutDashboard, label: 'Panel de Control', path: '/dashboard' },
-    { icon: BookOpen, label: 'Mis Clases', path: '/dashboard/clases' },
-    { icon: Users, label: 'Estudiantes', path: '/dashboard/estudiantes' },
-    { icon: Calendar, label: 'Asistencias', path: '/dashboard/asistencias' },
+    { icon: LayoutDashboard, label: 'Panel de Control', path: '/dashboard', id: 'tour-dashboard' },   
+    { icon: BookOpen, label: 'Mis Clases', path: '/dashboard/clases', id: 'tour-clases' },
+    { icon: Users, label: 'Estudiantes', path: '/dashboard/estudiantes', id: 'tour-estudiantes' },      
+    { icon: Calendar, label: 'Asistencias', path: '/dashboard/asistencias', id: 'tour-asistencias' },   
   ];
+
+  const iniciarGuia = () => {
+    const driverObj = driver({
+      showProgress: true,
+      nextBtnText: 'Siguiente',
+      prevBtnText: 'Anterior',
+      doneBtnText: 'Terminar',
+      steps: [
+        { 
+          element: '#tour-dashboard', 
+          popover: { 
+            title: 'Panel de Control', 
+            description: 'Aquí verás un resumen rápido de tus clases, estudiantes y estadísticas generales.', 
+            side: 'right', 
+            align: 'start' 
+          } 
+        },
+        { 
+          element: '#tour-clases', 
+          popover: { 
+            title: 'Gestión de Clases', 
+            description: 'Acá podrás crear tus materias, asignarles un nombre y describirlas.', 
+            side: 'right', 
+            align: 'start' 
+          } 
+        },
+        { 
+          element: '#tour-estudiantes', 
+          popover: { 
+            title: 'Base de Datos de Alumnos', 
+            description: 'Visualiza la lista de estudiantes inscritos, o impórtalos fácilmente usando un archivo Excel.', 
+            side: 'right', 
+            align: 'start' 
+          } 
+        },
+        { 
+          element: '#tour-asistencias', 
+          popover: { 
+            title: 'Asistencias y Participación', 
+            description: 'El núcleo de ClassAssist. Genera códigos QR, elige alumnos al azar con la ruleta y asigna calificaciones.', 
+            side: 'right', 
+            align: 'start' 
+          } 
+        },
+        { 
+          element: '#tour-profile', 
+          popover: { 
+            title: 'Tu Cuenta', 
+            description: 'Cambia tu contraseña, actualiza tu correo, o cierra sesión desde este menú.', 
+            side: 'bottom', 
+            align: 'end' 
+          } 
+        }
+      ]
+    });
+    driverObj.drive();
+  };
 
   return (
     <aside 
@@ -39,6 +98,7 @@ export default function Sidebar({ isOpen }) {
           <NavLink
             key={item.path}
             to={item.path}
+            id={item.id}
             end={item.path === '/dashboard'}
             title={!isOpen ? item.label : ""}
             className={({ isActive }) => 
@@ -61,7 +121,10 @@ export default function Sidebar({ isOpen }) {
           <div className="bg-[#322d2a] rounded-2xl p-4 border border-white/5">
             <h4 className="text-sm font-semibold mb-1">¿Necesitas ayuda?</h4>
             <p className="text-xs text-gray-400 mb-3">Consulta la documentación de ClassAssist</p>
-            <button className="w-full py-2 bg-white/10 hover:bg-white/20 text-xs font-medium rounded-lg transition-colors">
+            <button 
+              onClick={iniciarGuia}
+              className="w-full py-2 bg-white/10 hover:bg-white/20 text-xs font-medium rounded-lg transition-colors"
+            >
               Ver Guía
             </button>
           </div>

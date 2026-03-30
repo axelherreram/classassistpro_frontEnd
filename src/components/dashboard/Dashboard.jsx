@@ -1,15 +1,41 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import DashboardLayout from '../layout/DashboardLayout';
-import { Users, BookOpen, UserCheck, Calendar } from 'lucide-react';
+import { Users, BookOpen, UserCheck, Calendar, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
 import CrearClaseModal from './CrearClaseModal';
+import { dashboardService } from '../../services/dashboard.service';
 
 export default function Dashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [metrica, setMetrica] = useState({
+    clasesActivas: 0,
+    totalEstudiantes: 0,
+    asistenciaPromedio: 0,
+    sesionesRestantes: 0,
+    clasesHoy: []
+  });
+  const [loading, setLoading] = useState(true);
+
+  const cargarMetricas = async () => {
+    try {
+      setLoading(true);
+      const data = await dashboardService.obtenerMetricas();
+      setMetrica(data);
+    } catch (error) {
+      toast.error('Error al cargar las métricas');
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    cargarMetricas();
+  }, []);
 
   const handleClaseCreada = () => {
     toast.success('¡Clase creada exitosamente!');
-    // Aquí a futuro implementaremos la lógica para recargar la lista de clases
+    cargarMetricas();
   };
 
   return (
@@ -21,52 +47,57 @@ export default function Dashboard() {
         </div>
         
         {/* Tarjetas de Métricas */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 relative">
+          {loading && (
+            <div className="absolute inset-0 bg-white/50 backdrop-blur-[1px] z-10 flex items-center justify-center rounded-3xl">
+              <RefreshCw className="animate-spin text-gray-400" />
+            </div>
+          )}
           <div className="bg-white p-6 rounded-3xl shadow-[0_2px_10px_rgb(0,0,0,0.02)] border border-gray-100 flex flex-col justify-between">
             <div className="flex justify-between items-start mb-4">
-              <div className="bg-blue-50 text-blue-600 p-3 rounded-2xl">
+              <div className="bg-blue-50 text-blue-600 p-3 rounded-2xl">        
                 <BookOpen className="w-6 h-6" />
               </div>
             </div>
             <div>
               <h3 className="text-gray-500 text-sm font-medium mb-1">Clases Activas</h3>
-              <p className="text-3xl font-bold text-gray-900">4</p>
+              <p className="text-3xl font-bold text-gray-900">{metrica.clasesActivas}</p>
             </div>
           </div>
 
           <div className="bg-white p-6 rounded-3xl shadow-[0_2px_10px_rgb(0,0,0,0.02)] border border-gray-100 flex flex-col justify-between">
             <div className="flex justify-between items-start mb-4">
-              <div className="bg-green-50 text-green-600 p-3 rounded-2xl">
+              <div className="bg-green-50 text-green-600 p-3 rounded-2xl">      
                 <Users className="w-6 h-6" />
               </div>
             </div>
             <div>
               <h3 className="text-gray-500 text-sm font-medium mb-1">Total Estudiantes</h3>
-              <p className="text-3xl font-bold text-gray-900">128</p>
+              <p className="text-3xl font-bold text-gray-900">{metrica.totalEstudiantes}</p>
             </div>
           </div>
 
           <div className="bg-white p-6 rounded-3xl shadow-[0_2px_10px_rgb(0,0,0,0.02)] border border-gray-100 flex flex-col justify-between">
             <div className="flex justify-between items-start mb-4">
-              <div className="bg-purple-50 text-purple-600 p-3 rounded-2xl">
+              <div className="bg-purple-50 text-purple-600 p-3 rounded-2xl">    
                 <UserCheck className="w-6 h-6" />
               </div>
             </div>
             <div>
               <h3 className="text-gray-500 text-sm font-medium mb-1">Asistencia Promedio</h3>
-              <p className="text-3xl font-bold text-gray-900">92%</p>
+              <p className="text-3xl font-bold text-gray-900">{metrica.asistenciaPromedio}%</p>
             </div>
           </div>
 
           <div className="bg-white p-6 rounded-3xl shadow-[0_2px_10px_rgb(0,0,0,0.02)] border border-gray-100 flex flex-col justify-between">
             <div className="flex justify-between items-start mb-4">
-              <div className="bg-orange-50 text-orange-600 p-3 rounded-2xl">
+              <div className="bg-orange-50 text-orange-600 p-3 rounded-2xl">    
                 <Calendar className="w-6 h-6" />
               </div>
             </div>
             <div>
               <h3 className="text-gray-500 text-sm font-medium mb-1">Sesiones Restantes</h3>
-              <p className="text-3xl font-bold text-gray-900">12</p>
+              <p className="text-3xl font-bold text-gray-900">{metrica.sesionesRestantes}</p>
             </div>
           </div>
         </div>
@@ -79,16 +110,31 @@ export default function Dashboard() {
                 <h2 className="text-xl font-bold text-gray-900">Clases de Hoy</h2>
                 <button className="text-sm font-medium text-[#2d7a5d] hover:text-[#225d46]">Ver todas</button>
               </div>
-              
-              <div className="py-12 flex flex-col items-center justify-center text-center border-2 border-dashed border-gray-100 rounded-2xl bg-gray-50/50">
-                <div className="bg-white p-4 rounded-full shadow-sm border border-gray-100 mb-4">
-                  <Calendar className="w-8 h-8 text-gray-400" />
+              {metrica.clasesHoy && metrica.clasesHoy.length > 0 ? (
+                <div className="space-y-4">
+                  {metrica.clasesHoy.map((clase, idx) => (
+                    <div key={idx} className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                      <div>
+                        <h3 className="font-bold text-gray-900">{clase.nombreClase}</h3>
+                        <p className="text-sm text-gray-500">{clase.tema || "Sin tema especificado"}</p>
+                      </div>
+                      <div className="bg-white p-2 rounded-lg shadow-sm">
+                        <Calendar className="w-5 h-5 text-gray-400" />
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-1">No hay clases programadas</h3>
-                <p className="text-sm text-gray-500 max-w-sm">
-                  Parece que tienes el día libre. Puedes crear una nueva clase si necesitas reunirte con estudiantes.
-                </p>
-              </div>
+              ) : (
+                <div className="py-12 flex flex-col items-center justify-center text-center border-2 border-dashed border-gray-100 rounded-2xl bg-gray-50/50">
+                  <div className="bg-white p-4 rounded-full shadow-sm border border-gray-100 mb-4">
+                    <Calendar className="w-8 h-8 text-gray-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-1">No hay clases programadas</h3>
+                  <p className="text-sm text-gray-500 max-w-sm">
+                    Parece que tienes el día libre. Puedes crear una nueva clase si necesitas reunirte con estudiantes.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
           
