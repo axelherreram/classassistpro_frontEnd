@@ -30,7 +30,8 @@ apiClient.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       // Si el token expira o es inválido, podrías redirigir al login
       localStorage.removeItem('token');
-      // window.location.href = '/'; // Descomentarlo si quieres forzar salida
+      localStorage.removeItem('user'); // Also removing user just in case
+      window.location.href = '/';
     }
     return Promise.reject(error);
   }

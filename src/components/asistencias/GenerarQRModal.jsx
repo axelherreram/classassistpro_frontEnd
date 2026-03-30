@@ -49,10 +49,10 @@ export default function GenerarQRModal({ isOpen, onClose, sesionId }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm transition-opacity">
       <div 
-        className="bg-white rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden animate-fade-in-up flex flex-col text-center"
+        className="bg-white rounded-3xl w-full max-w-sm max-h-[90vh] shadow-2xl overflow-y-auto animate-fade-in-up flex flex-col text-center"
         onClick={e => e.stopPropagation()}
       >
-        <div className="flex justify-between items-center p-4 border-b border-gray-100 bg-gray-50/50">
+        <div className="flex justify-between items-center p-4 border-b border-gray-100 bg-gray-50/50 sticky top-0 z-10">
           <h3 className="font-bold text-gray-900 flex items-center gap-2">
             <QrCode className="w-5 h-5 text-[#2d7a5d]" />
             Código QR de Asistencia

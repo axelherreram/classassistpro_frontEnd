@@ -182,29 +182,10 @@ const Login = () => {
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-200" />
               </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white px-3 text-gray-400 font-medium tracking-wider">
-                  ¿Nuevo en ClassAssist?
-                </span>
-              </div>
             </div>
 
-            <div className="mt-6">
-              <button
-                type="button"
-                className="w-full flex justify-center py-2.5 bg-white border border-gray-200 rounded-xl shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 transition-colors"
-              >
-                Crear una cuenta
-              </button>
-            </div>
           </div>
 
-          <p className="mt-8 text-center text-xs text-gray-500">
-            Al continuar, aceptas nuestros{' '}
-            <a href="#" className="underline hover:text-gray-700">Términos de Servicio</a>
-            {' '}y{' '}
-            <a href="#" className="underline hover:text-gray-700">Política de Privacidad</a>
-          </p>
         </div>
       </div>
     </div>

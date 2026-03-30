@@ -71,7 +71,7 @@ export default function Sidebar({ isOpen }) {
   return (
     <aside 
       className={`${
-        isOpen ? 'w-72' : 'w-20'
+        isOpen ? 'w-64 sm:w-72' : 'w-20 hidden md:flex'
       } bg-[#201b18] h-full text-white transition-all duration-300 ease-in-out flex flex-col flex-shrink-0 border-r border-[#322d2a]`}
     >
       <div className="h-16 flex items-center justify-center border-b border-[#322d2a] px-4">

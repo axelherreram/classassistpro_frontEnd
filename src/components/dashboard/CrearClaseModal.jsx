@@ -63,11 +63,11 @@ export default function CrearClaseModal({ isOpen, onClose, onClaseCreada, claseA
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm transition-opacity">
       <div 
-        className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-fade-in-up"
+        className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-fade-in-up"
         onClick={e => e.stopPropagation()}
       >
         {/* Cabecera del Modal */}
-        <div className="flex justify-between items-center p-6 border-b border-gray-100 bg-gray-50/50">
+        <div className="flex justify-between items-center p-6 border-b border-gray-100 bg-gray-50/50 shrink-0">
           <h3 className="text-xl font-bold text-gray-900">
             {claseAEditar ? 'Editar Clase' : 'Nueva Clase'}
           </h3>
@@ -80,7 +80,7 @@ export default function CrearClaseModal({ isOpen, onClose, onClaseCreada, claseA
         </div>
 
         {/* Cuerpo del Modal */}
-        <div className="p-6">
+        <div className="p-6 overflow-y-auto flex-1">
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">

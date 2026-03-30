@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
 import DashboardLayout from '../layout/DashboardLayout';
-import GruposModal from './GruposModal';
-import RuletaModal from './RuletaModal';
 import { Calendar, BookOpen, Plus, QrCode, Search, CheckCircle2, Clock, Users, Dices, UsersRound , Timer, Maximize } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { claseService } from '../../services/clase.service';
@@ -10,7 +8,6 @@ import { useNavigate } from 'react-router-dom';
 import NuevaSesionModal from './NuevaSesionModal';
 import GenerarQRModal from './GenerarQRModal';
 import DetallesSesionModal from './DetallesSesionModal';
-import TimerModal from './TimerModal';
 
 export default function Asistencias() {
   const navigate = useNavigate();
@@ -27,11 +24,6 @@ export default function Asistencias() {
 
   const [isListaModalOpen, setIsListaModalOpen] = useState(false);
   const [sesionSeleccionadaParaLista, setSesionSeleccionadaParaLista] = useState(null);
-  const [isRuletaModalOpen, setIsRuletaModalOpen] = useState(false);
-  const [sesionSeleccionadaParaRuleta, setSesionSeleccionadaParaRuleta] = useState(null);
-  const [isGruposModalOpen, setIsGruposModalOpen] = useState(false);
-  const [isTimerModalOpen, setIsTimerModalOpen] = useState(false);
-  const [sesionSeleccionadaParaGrupos, setSesionSeleccionadaParaGrupos] = useState(null);
 
   // 1. Cargar las clases
   useEffect(() => {
@@ -198,30 +190,6 @@ export default function Asistencias() {
                         >
                           <Users className="w-4 h-4" /> Ver
                         </button>
-                        <button
-                          onClick={() => {
-                            setSesionSeleccionadaParaRuleta(sesion.id);
-                            setIsRuletaModalOpen(true);
-                          }}
-                          className="flex-[1_1_100%] sm:flex-1 flex justify-center items-center gap-1 py-2 px-2 bg-purple-50 text-purple-700 text-xs font-semibold rounded-lg hover:bg-purple-100 border border-purple-100 transition-colors"   
-                        >
-                          <Dices className="w-4 h-4" /> Ruleta
-                        </button>
-                        <button
-                          onClick={() => {
-                            setSesionSeleccionadaParaGrupos(sesion.id);
-                            setIsGruposModalOpen(true);
-                          }}
-                          className="flex-[1_1_100%] sm:flex-1 flex justify-center items-center gap-1 py-2 px-2 bg-teal-50 text-teal-700 text-xs font-semibold rounded-lg hover:bg-teal-100 border border-teal-100 transition-colors"
-                        >
-                          <UsersRound className="w-4 h-4" /> Grupos
-                        </button>
-                        <button
-                          onClick={() => setIsTimerModalOpen(true)}
-                          className="flex-[1_1_100%] sm:flex-1 flex justify-center items-center gap-1 py-2 px-2 bg-orange-50 text-orange-700 text-xs font-semibold rounded-lg hover:bg-orange-100 border border-orange-100 transition-colors"   
-                        >
-                          <Timer className="w-4 h-4" /> Tiempo
-                        </button>
                         
                         <button
                           onClick={() => {
@@ -264,34 +232,6 @@ export default function Asistencias() {
           setSesionSeleccionadaParaLista(null);
         }}
         sesionId={sesionSeleccionadaParaLista}
-      />
-
-      <RuletaModal
-        isOpen={isRuletaModalOpen}
-        onClose={() => {
-          setIsRuletaModalOpen(false);
-          setSesionSeleccionadaParaRuleta(null);
-        }}
-        sesionId={sesionSeleccionadaParaRuleta}
-      />
-
-                  <GruposModal
-        isOpen={isGruposModalOpen}
-        onClose={() => {
-          setIsGruposModalOpen(false);
-          setSesionSeleccionadaParaGrupos(null);
-        }}
-        sesionId={sesionSeleccionadaParaGrupos}
-      />
-
-      <TimerModal
-        isOpen={isTimerModalOpen}
-        onClose={() => setIsTimerModalOpen(false)}
-      />
-
-      <TimerModal
-        isOpen={isTimerModalOpen}
-        onClose={() => setIsTimerModalOpen(false)}
       />
     </DashboardLayout>
   );

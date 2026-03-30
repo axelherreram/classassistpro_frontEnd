@@ -143,8 +143,8 @@ const DesempenoModal = ({ isOpen, onClose, sesionId, claseId }) => {
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                <table className="w-full text-left border-collapse">
+              <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-x-auto">
+                <table className="w-full text-left border-collapse min-w-[600px]">
                   <thead>
                     <tr className="bg-gray-50 border-b border-gray-100 text-gray-600 text-xs uppercase tracking-wider">
                       <th className="p-4 font-semibold text-center w-16">Rank</th>

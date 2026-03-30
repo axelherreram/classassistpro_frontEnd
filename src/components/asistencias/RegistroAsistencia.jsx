@@ -1,8 +1,9 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Camera, Send, CheckCircle, AlertCircle, X, RefreshCw } from 'lucide-react';
+import { Camera, Send, CheckCircle, AlertCircle, X, RefreshCw, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { asistenciaService } from '../../services/asistencia.service';
+import * as faceapi from '@vladmandic/face-api';
 
 export default function RegistroAsistencia() {
   const [searchParams] = useSearchParams();
@@ -14,10 +15,26 @@ export default function RegistroAsistencia() {
   const [camaraActiva, setCamaraActiva] = useState(false);
   const [resultado, setResultado] = useState(null); // 'exito' | 'error' | null
   const [mensajeError, setMensajeError] = useState('');
+  const [modelosCargados, setModelosCargados] = useState(false);
+  const [analizandoRostro, setAnalizandoRostro] = useState(false);
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
+
+  // Cargar modelos de face-api
+  useEffect(() => {
+    const loadModels = async () => {
+      try {
+        await faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/');
+        setModelosCargados(true);
+      } catch (error) {
+        console.error('Error al cargar modelos:', error);
+        toast.error('No se pudieron cargar los modelos de IA. Recarga la página.');
+      }
+    };
+    loadModels();
+  }, []);
 
   // Activar la cámara
   const encenderCamara = async () => {
@@ -51,8 +68,14 @@ export default function RegistroAsistencia() {
   }, []);
 
   // Capturar la imagen
-  const tomarFoto = () => {
+  const tomarFoto = async () => {
     if (!videoRef.current || !canvasRef.current) return;
+    
+    // Validar si los modelos de IA están listos
+    if (!modelosCargados) {
+      toast.error('Esperando a que la IA se inicialice. Intenta de nuevo en unos segundos.');
+      return;
+    }
     
     // Dibujar la imagen del video en el canvas
     const video = videoRef.current;
@@ -64,16 +87,41 @@ export default function RegistroAsistencia() {
       return;
     }
     
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    
-    // Convertir canvas a base64
-    const imageData = canvas.toDataURL('image/jpeg', 0.8); // 80% calidad
-    setFoto(imageData);
-    detenerCamara();
+    setAnalizandoRostro(true);
+
+    try {
+      // 1. Detectar el rostro en vivo directamente del video para validación
+      const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions());
+      
+      if (!detections || detections.length === 0) {
+         toast.error('❌ No se detectó ningún rostro vivo. ¡Asegúrate de mirar a la cámara!');
+         setAnalizandoRostro(false);
+         return;
+      }
+      if (detections.length > 1) {
+         toast.error('❌ Se detectó más de una persona. Por favor, toma la foto solo.');
+         setAnalizandoRostro(false);
+         return;
+      }
+
+      // Si todo está bien (1 rostro), se toma la foto normal
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      
+      // Convertir canvas a base64
+      const imageData = canvas.toDataURL('image/jpeg', 0.8); // 80% calidad
+      setFoto(imageData);
+      toast.success('¡Rostro detectado correctamente!');
+      detenerCamara();
+    } catch (error) {
+      console.error(error);
+      toast.error('Error al analizar la imagen.');
+    } finally {
+      setAnalizandoRostro(false);
+    }
   };
 
   const descartarFoto = () => {
@@ -219,11 +267,22 @@ export default function RegistroAsistencia() {
                   <button
                     type="button"
                     onClick={tomarFoto}
-                    className="w-16 h-16 bg-white rounded-full border-4 border-gray-300 flex items-center justify-center p-1 active:scale-95 transition-transform"
+                    disabled={analizandoRostro || !modelosCargados}
+                    className="w-16 h-16 bg-white rounded-full border-4 border-gray-300 flex items-center justify-center p-1 active:scale-95 transition-transform disabled:opacity-50 disabled:active:scale-100"
                   >
-                    <div className="w-full h-full bg-[#2d7a5d] rounded-full"></div>
+                    {analizandoRostro ? (
+                      <Loader2 className="w-8 h-8 text-[#2d7a5d] animate-spin" />
+                    ) : (
+                      <div className="w-full h-full bg-[#2d7a5d] rounded-full"></div>
+                    )}
                   </button>
                 </div>
+                {/* Indicador de carga de IA */}
+                {!modelosCargados && (
+                  <div className="absolute top-4 left-4 bg-black/60 text-white text-xs px-3 py-1.5 rounded-full font-medium backdrop-blur-md flex items-center gap-2">
+                    <Loader2 className="w-3 h-3 animate-spin" /> Cargando IA...
+                  </div>
+                )}
                 {/* Botón para cerrar cámara */}
                 <button
                   type="button"
