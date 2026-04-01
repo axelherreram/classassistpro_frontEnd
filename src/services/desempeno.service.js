@@ -1,19 +1,26 @@
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';    
-
-const getAuthHeaders = () => {
-  const token = localStorage.getItem('token');
-  return { Authorization: `Bearer ${token}` };
-};
+import apiClient from './api';
 
 export const desempenoService = {
   obtenerRankingPorClase: async (claseId) => {
-    const res = await axios.get(`${API_URL}/desempeno/clase/${claseId}/ranking`, { headers: getAuthHeaders() });
-    return res.data;
+    try {
+      const response = await apiClient.get(`/desempeno/clase/${claseId}/ranking`);
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        throw new Error(error.response.data.error || 'Error al obtener ranking por clase');
+      }
+      throw new Error(error.message || 'Error de conexión');
+    }
   },
   obtenerRankingPorSesion: async (sesionId) => {
-    const res = await axios.get(`${API_URL}/desempeno/sesion/${sesionId}/ranking`, { headers: getAuthHeaders() });
-    return res.data;
+    try {
+      const response = await apiClient.get(`/desempeno/sesion/${sesionId}/ranking`);
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        throw new Error(error.response.data.error || 'Error al obtener ranking por sesión');
+      }
+      throw new Error(error.message || 'Error de conexión');
+    }
   }
 };
