@@ -11,12 +11,27 @@ const Perfil = () => {
   const forceUpdate = location.state?.forceUpdate || false;
 
   const [formData, setFormData] = useState({
+    nombre: '',
     correo: '',
     oldPassword: '',
     newPassword: '',
     confirmPassword: ''
   });
   const [loading, setLoading] = useState(false);
+
+  // Cargar datos actuales desde localStorage al montar el componente
+  React.useEffect(() => {
+    try {
+      const savedUser = JSON.parse(localStorage.getItem('user') || '{}');
+      setFormData(prev => ({
+        ...prev,
+        nombre: savedUser.nombre || '',
+        correo: savedUser.correo || ''
+      }));
+    } catch (e) {
+      console.error("Error al leer datos del usuario", e);
+    }
+  }, []);
 
   const handleChange = (e) => {
     setFormData({
@@ -41,20 +56,31 @@ const Perfil = () => {
     setLoading(true);
     try {
       const dataToSubmit = {};
+      if (formData.nombre) dataToSubmit.nombre = formData.nombre;
       if (formData.correo) dataToSubmit.correo = formData.correo;
       if (formData.newPassword) {
         dataToSubmit.oldPassword = formData.oldPassword;
         dataToSubmit.newPassword = formData.newPassword;
       }
 
-      await authService.updateProfile(dataToSubmit);
+      const response = await authService.updateProfile(dataToSubmit);
+      
+      // Actualizar localStorage con el nuevo nombre y correo recibidos
+      const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+      const updatedUser = { 
+        ...currentUser, 
+        actualizoContra: response.actualizoContra,
+        correo: response.correo,
+        nombre: response.nombre
+      };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
       
       toast.success('Perfil actualizado correctamente');
       
       if (forceUpdate) {
          navigate('/dashboard');
       } else {
-         // Resetear forms
+         // Resetear forms (salvo el nombre y correo que sí se quedan)
          setFormData(prev => ({
            ...prev,
            oldPassword: '',
@@ -98,6 +124,24 @@ const Perfil = () => {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                  <User className="w-5 h-5 text-[#2d7a5d]" />
+                  Actualizar Nombre (Opcional)
+                </h3>
+                <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200">
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Tu Nombre Completo</label>
+                  <input
+                    type="text"
+                    name="nombre"
+                    value={formData.nombre}
+                    onChange={handleChange}
+                    placeholder="Tu nombre y apellido"
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2d7a5d]/30 focus:border-[#2d7a5d] transition-all"
+                  />
+                </div>
+              </div>
+
               <div>
                 <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
                   <Mail className="w-5 h-5 text-[#2d7a5d]" />

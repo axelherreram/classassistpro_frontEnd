@@ -130,7 +130,7 @@ const Login = () => {
                   value={formData.correo}
                   onChange={handleChange}
                   required
-                  placeholder="catedratico@prueba.com"
+                  placeholder="correo@ejemplo.com"
                   className="block w-full pl-11 pr-3 py-2.5 bg-[#f4f7fb] border border-transparent rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-green-600/20 focus:border-green-600/30 transition-all sm:text-sm"
                 />
               </div>

@@ -112,6 +112,9 @@ export default function RegistroAsistencia() {
       canvas.height = video.videoHeight;
       
       const ctx = canvas.getContext('2d');
+      // Aplicar modo espejo al canvas para que guarde la foto tal como la ve el usuario
+      ctx.translate(canvas.width, 0);
+      ctx.scale(-1, 1);
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
       
       // Convertir canvas a base64
@@ -263,7 +266,7 @@ export default function RegistroAsistencia() {
                   autoPlay 
                   playsInline 
                   muted 
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover scale-x-[-1]"
                 />
                 {/* Botón flotante para tomar la foto */}
                 <div className="absolute inset-x-0 bottom-6 flex justify-center">

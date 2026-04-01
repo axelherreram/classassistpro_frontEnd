@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../layout/DashboardLayout';
 import { Users, BookOpen, UserCheck, Calendar, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -6,6 +7,7 @@ import CrearClaseModal from './CrearClaseModal';
 import { dashboardService } from '../../services/dashboard.service';
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [metrica, setMetrica] = useState({
     clasesActivas: 0,
@@ -23,7 +25,6 @@ export default function Dashboard() {
       setMetrica(data);
     } catch (error) {
       toast.error('Error al cargar las métricas');
-      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -108,7 +109,11 @@ export default function Dashboard() {
             <div className="bg-white rounded-3xl shadow-[0_2px_10px_rgb(0,0,0,0.02)] border border-gray-100 p-6 sm:p-8">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-bold text-gray-900">Clases de Hoy</h2>
-                <button className="text-sm font-medium text-[#2d7a5d] hover:text-[#225d46]">Ver todas</button>
+                <button 
+                  onClick={() => navigate('/dashboard/clases')}
+                  className="text-sm font-medium text-[#2d7a5d] hover:text-[#225d46]">
+                  Ver todas
+                </button>
               </div>
               {metrica.clasesHoy && metrica.clasesHoy.length > 0 ? (
                 <div className="space-y-4">
@@ -152,15 +157,6 @@ export default function Dashboard() {
                       <BookOpen className="w-5 h-5 text-gray-700" />
                     </div>
                     <span className="font-medium text-gray-900">Crear Clase</span>
-                  </div>
-                </button>
-                
-                <button className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-2xl transition-colors border border-gray-100">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-white p-2.5 rounded-xl shadow-sm">
-                      <Users className="w-5 h-5 text-gray-700" />
-                    </div>
-                    <span className="font-medium text-gray-900">Importar Listado</span>
                   </div>
                 </button>
               </div>

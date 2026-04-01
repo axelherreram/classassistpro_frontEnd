@@ -76,10 +76,10 @@ export default function DetallesSesionModal({ isOpen, onClose, sesionId }) {
           </div>
 
           {/* Navigation Tabs */}
-          <div className="flex gap-2 bg-black/10 p-1.5 rounded-xl self-start">
+          <div className="flex gap-2 bg-black/10 p-1.5 rounded-xl overflow-x-auto w-full sm:w-auto sm:self-start scrollbar-hide">
             <button
               onClick={() => setActiveTab('asistencias')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
                 activeTab === 'asistencias' ? 'bg-white text-[#2d7a5d] shadow-sm' : 'text-white/80 hover:text-white hover:bg-white/10'
               }`}
             >
@@ -87,7 +87,7 @@ export default function DetallesSesionModal({ isOpen, onClose, sesionId }) {
             </button>
             <button
               onClick={() => setActiveTab('participaciones')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
                 activeTab === 'participaciones' ? 'bg-white text-[#2d7a5d] shadow-sm' : 'text-white/80 hover:text-white hover:bg-white/10'
               }`}
             >
@@ -95,7 +95,7 @@ export default function DetallesSesionModal({ isOpen, onClose, sesionId }) {
             </button>
             <button
               onClick={() => setActiveTab('grupos')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
                 activeTab === 'grupos' ? 'bg-white text-[#2d7a5d] shadow-sm' : 'text-white/80 hover:text-white hover:bg-white/10'
               }`}
             >
