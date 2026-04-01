@@ -37,6 +37,12 @@ const Login = () => {
       // Guardar el token en localStorage
       if (data && data.token) {
         localStorage.setItem('token', data.token);
+        // Guardar información del usuario
+        localStorage.setItem('user', JSON.stringify({
+          nombre: data.nombre,
+          correo: data.correo,
+          actualizoContra: data.actualizoContra
+        }));
       } else {
         localStorage.setItem('token', 'token_temporal_por_si_acaso');
       }
