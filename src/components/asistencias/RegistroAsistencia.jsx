@@ -39,6 +39,9 @@ export default function RegistroAsistencia() {
   // Activar la cámara
   const encenderCamara = async () => {
     try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('Tu navegador no permite acceso a la cámara. Si estás desde un móvil/IP, necesitas HTTPS para usar la cámara en la web.');
+      }
       const stream = await navigator.mediaDevices.getUserMedia({ 
         video: { facingMode: 'user' }, // usar cámara frontal
         audio: false 
@@ -47,7 +50,7 @@ export default function RegistroAsistencia() {
       setCamaraActiva(true);
     } catch (err) {
       console.error(err);
-      toast.error('No se pudo acceder a la cámara. Asegúrate de dar permisos.');
+      toast.error(err.message || 'No se pudo acceder a la cámara. Asegúrate de dar permisos.');
     }
   };
 

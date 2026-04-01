@@ -35,15 +35,50 @@ export default function GenerarQRModal({ isOpen, onClose, sesionId }) {
 
   const handleCopyLink = () => {
     if (qrData?.token) {
-      // In a real scenario, this would be your external frontend route for students
-      // We will read VITE_FRONTEND_URL. If omitted fallback to current window location origin
       const baseUrl = import.meta.env.VITE_FRONTEND_URL || window.location.origin;
       const url = `${baseUrl}/registro-asistencia?token=${qrData.token}`;
-      navigator.clipboard.writeText(url);
-      setCopied(true);
-      toast.success('Enlace de asistencia copiado al portapapeles');
-      setTimeout(() => setCopied(false), 3000);
+      
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url)
+          .then(() => showSuccess())
+          .catch(err => fallbackCopyTextToClipboard(url));
+      } else {
+        fallbackCopyTextToClipboard(url);
+      }
     }
+  };
+
+  const showSuccess = () => {
+    setCopied(true);
+    toast.success('Enlace de asistencia copiado al portapapeles');
+    setTimeout(() => setCopied(false), 3000);
+  };
+
+  const fallbackCopyTextToClipboard = (text) => {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    
+    // Avoid scrolling to bottom
+    textArea.style.top = "0";
+    textArea.style.left = "0";
+    textArea.style.position = "fixed";
+
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+
+    try {
+      const successful = document.execCommand('copy');
+      if (successful) {
+        showSuccess();
+      } else {
+        toast.error('No se pudo copiar el enlace');
+      }
+    } catch (err) {
+      toast.error('Error al intentar copiar el enlace');
+    }
+
+    document.body.removeChild(textArea);
   };
 
   return (

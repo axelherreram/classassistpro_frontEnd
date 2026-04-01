@@ -41,6 +41,9 @@ export default function PantallaClase() {
   // Funciones de Ruido
   const startNoiseMeter = async () => {
     try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('El navegador no permite acceso al micrófono (se requiere HTTPS o localhost).');
+      }
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
       audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
       analyserRef.current = audioContextRef.current.createAnalyser();
