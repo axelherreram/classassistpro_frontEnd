@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { X, QrCode, Clock, Copy, Check } from 'lucide-react';
+import { X, QrCode, Clock, Copy, Check, Users } from 'lucide-react';
 import { asistenciaService } from '../../services/asistencia.service';
+import { socket } from '../../services/socket.service';
 import toast from 'react-hot-toast';
 
 export default function GenerarQRModal({ isOpen, onClose, sesionId }) {
@@ -8,6 +9,7 @@ export default function GenerarQRModal({ isOpen, onClose, sesionId }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [asistenciasEnVivo, setAsistenciasEnVivo] = useState([]);
 
   useEffect(() => {
     if (isOpen && sesionId) {
@@ -17,6 +19,20 @@ export default function GenerarQRModal({ isOpen, onClose, sesionId }) {
         try {
           const data = await asistenciaService.generarQR(sesionId);
           setQrData(data);
+
+          // Conectar a WebSockets
+          socket.connect();
+          socket.emit('join-sesion', sesionId);
+
+          const manejarNuevaAsistencia = (data) => {
+            // Añadir al principio del arreglo para que salga de primera
+            setAsistenciasEnVivo((prev) => [data, ...prev]);
+            toast.success(`¡${data.Estudiante.nombre} registró su asistencia!`, {
+              icon: '👋'
+            });
+          };
+
+          socket.on('nueva-asistencia', manejarNuevaAsistencia);
         } catch (err) {
           setError(err.message);
           toast.error(err.message);
@@ -26,8 +42,14 @@ export default function GenerarQRModal({ isOpen, onClose, sesionId }) {
       };
       
       fetchQR();
+
+      return () => {
+        socket.off('nueva-asistencia');
+        socket.disconnect();
+      };
     } else {
       setQrData(null);
+      setAsistenciasEnVivo([]);
     }
   }, [isOpen, sesionId]);
 
@@ -133,11 +155,49 @@ export default function GenerarQRModal({ isOpen, onClose, sesionId }) {
               
               <button
                 onClick={handleCopyLink}
-                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-[#2d7a5d] hover:bg-[#2d7a5d]/10 rounded-lg transition-colors border border-[#2d7a5d]/20"
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-[#2d7a5d] hover:bg-[#2d7a5d]/10 rounded-lg transition-colors border border-[#2d7a5d]/20 mb-6"
               >
                 {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                 {copied ? '¡Copiado!' : 'Copiar link manual'}
               </button>
+
+              {/* Feed en vivo de Asistencias */}
+              {asistenciasEnVivo.length > 0 && (
+                <div className="w-full mt-4 border-t border-gray-100 pt-6 animate-fade-in text-left">
+                  <h4 className="text-sm font-bold text-gray-700 flex items-center gap-2 mb-3">
+                    <Users className="w-4 h-4 text-emerald-500" />
+                    Registros en tiempo real ({asistenciasEnVivo.length})
+                    <span className="relative flex h-2 w-2 ml-1">
+                      <span className="animate-ping-absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                  </h4>
+                  <div className="space-y-3 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
+                    {asistenciasEnVivo.map((asist, idx) => (
+                      <div key={idx} className="flex items-center gap-3 bg-gray-50 p-3 rounded-xl border border-gray-100 shadow-sm animate-fade-in-up">
+                        <div className="w-10 h-10 rounded-lg bg-gray-200 overflow-hidden shrink-0">
+                           <img 
+                             src={import.meta.env.VITE_API_URL.replace('/api', '') + asist.foto} 
+                             alt="selfie" 
+                             className="w-full h-full object-cover"
+                             onError={(e) => { e.target.src = 'https://ui-avatars.com/api/?name=' + asist.Estudiante.nombre; }}
+                           />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-bold text-gray-900 truncate" title={asist.Estudiante.nombre}>
+                            {asist.Estudiante.nombre}
+                          </p>
+                          <p className="text-xs text-gray-500 truncate">{asist.Estudiante.carnet}</p>
+                        </div>
+                        <div className="shrink-0 text-emerald-500">
+                          <Check className="w-5 h-5" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
             </div>
           ) : null}
         </div>
