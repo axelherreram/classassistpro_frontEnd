@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { QrCode, Dices, UsersRound, Timer, Activity, ChevronLeft, Maximize, Clock, Users, X, Trophy } from 'lucide-react';
+import { QrCode, Dices, UsersRound, Timer, Activity, ChevronLeft, Maximize, Clock, Users, X, Trophy, Check } from 'lucide-react';
 import { asistenciaService } from '../../services/asistencia.service';
+import { socket } from '../../services/socket.service';
 
 // Import our existing modals to use them in "modal mode" from the dashboard, 
 // OR we can import them and render them.
@@ -29,6 +30,7 @@ export default function PantallaClase() {
   // QR State
   const [qrData, setQrData] = useState(null);
   const [qrLoading, setQrLoading] = useState(false);
+  const [asistenciasEnVivo, setAsistenciasEnVivo] = useState([]);
   
   // Noise Meter State
   const [noiseLevel, setNoiseLevel] = useState(0);
@@ -96,8 +98,21 @@ export default function PantallaClase() {
     try {
       const data = await asistenciaService.generarQR(sesionId);
       setQrData(data);
+
+      // Conectar a WebSockets
+      socket.connect();
+      socket.emit('join-sesion', sesionId);
+
+      const manejarNuevaAsistencia = (nueva) => {
+        setAsistenciasEnVivo((prev) => [nueva, ...prev]);
+        toast.success(`¡${nueva.Estudiante.nombre} registró su asistencia!`, {
+          icon: '👋'
+        });
+      };
+
+      socket.on('nueva-asistencia', manejarNuevaAsistencia);
     } catch (err) {
-      toast.error('Error al generar QR');
+      toast.error(err.message || 'Error al generar QR');
     } finally {
       setQrLoading(false);
     }
@@ -107,6 +122,14 @@ export default function PantallaClase() {
     if (activeTool === 'qr' && !qrData) {
       loadQR();
     }
+    
+    return () => {
+      // Limpiar sockets al dejar de mostrar el QR
+      if (activeTool !== 'qr') {
+        socket.off('nueva-asistencia');
+        socket.disconnect();
+      }
+    };
   }, [activeTool]);
   
   const handleToolClick = (tool) => {
@@ -216,8 +239,45 @@ export default function PantallaClase() {
                     <img src={qrData.qrImage} alt="QR Sesion" className="w-64 h-64 sm:w-80 sm:h-80 object-contain" />
                   </div>
                   <div className="flex items-center gap-2 text-emerald-700 bg-emerald-50 px-6 py-3 rounded-2xl text-lg font-bold">
-                    <Clock className="w-6 h-6" /> Válido por {qrData.venceEn || '10 minutos'}
+                    <Clock className="w-6 h-6" /> Válido por 10 minutos
                   </div>
+
+                  {/* Feed en vivo de Asistencias dentro de PantallaClase */}
+                  {asistenciasEnVivo.length > 0 && (
+                    <div className="w-full mt-6 border-t border-gray-100 pt-6 animate-fade-in text-left">
+                      <h4 className="text-sm font-bold text-gray-700 flex items-center justify-center gap-2 mb-4">
+                        <Users className="w-5 h-5 text-emerald-500" />
+                        Registros en tiempo real ({asistenciasEnVivo.length})
+                        <span className="relative flex h-2 w-2 ml-1">
+                          <span className="animate-ping-absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        </span>
+                      </h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
+                        {asistenciasEnVivo.map((asist, idx) => (
+                          <div key={idx} className="flex items-center gap-3 bg-gray-50 hover:bg-gray-100 p-3 rounded-xl border border-gray-200 shadow-sm transition-colors animate-fade-in-up">
+                            <div className="w-12 h-12 rounded-xl bg-gray-200 overflow-hidden shrink-0 border-2 border-white shadow-sm">
+                              <img 
+                                src={import.meta.env.VITE_API_URL.replace('/api', '') + asist.foto} 
+                                alt="selfie" 
+                                className="w-full h-full object-cover"
+                                onError={(e) => { e.target.src = 'https://ui-avatars.com/api/?name=' + asist.Estudiante.nombre; }}
+                              />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-bold text-gray-900 truncate" title={asist.Estudiante.nombre}>
+                                {asist.Estudiante.nombre}
+                              </p>
+                              <p className="text-xs text-gray-500 truncate font-medium">{asist.Estudiante.carnet}</p>
+                            </div>
+                            <div className="shrink-0 text-emerald-500 bg-emerald-100 p-1.5 rounded-lg">
+                              <Check className="w-4 h-4" />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </>
               ) : (
                 <div className="text-red-500">No se pudo cargar el QR</div>
