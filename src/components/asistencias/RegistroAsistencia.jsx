@@ -235,7 +235,7 @@ export default function RegistroAsistencia() {
               value={carnet}
               onChange={(e) => setCarnet(e.target.value)}
               className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl text-lg font-medium text-center tracking-widest focus:ring-2 focus:ring-[#2d7a5d] outline-none"
-              placeholder="Ej: 20260123"
+              placeholder="Ej: 1890-xx-xxxx"
             />
           </div>
 
