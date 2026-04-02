@@ -120,7 +120,7 @@ export default function Sidebar({ isOpen }) {
         <div className="p-4 mt-auto">
           <div className="bg-[#322d2a] rounded-2xl p-4 border border-white/5">
             <h4 className="text-sm font-semibold mb-1">¿Necesitas ayuda?</h4>
-            <p className="text-xs text-gray-400 mb-3">Consulta la documentación de ClassAssist</p>
+            <p className="text-xs text-gray-400 mb-3">Recorrido guiado por ClassAssist</p>
             <button 
               onClick={iniciarGuia}
               className="w-full py-2 bg-white/10 hover:bg-white/20 text-xs font-medium rounded-lg transition-colors"

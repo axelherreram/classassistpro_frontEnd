@@ -146,7 +146,7 @@ export default function GenerarQRModal({ isOpen, onClose, sesionId }) {
               
               <div className="flex items-center gap-2 text-amber-600 bg-amber-50 px-4 py-2 rounded-xl text-sm font-medium mb-6">
                 <Clock className="w-4 h-4" />
-                Válido por {qrData.venceEn || '10 minutos'}
+                Válido por 10 minutos desde su generación
               </div>
 
               <p className="text-sm text-gray-500 mb-4 px-4">

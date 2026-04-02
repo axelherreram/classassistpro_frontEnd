@@ -21,6 +21,7 @@ const RuletaModal = ({ isOpen, onClose, sesionId, isSidePanel = false }) => {
 
   // Ref para el intervalo de animación
   const spinInterval = useRef(null);
+  const submitLockRef = useRef(false);
 
   useEffect(() => {
     if (isOpen && sesionId) {
@@ -45,6 +46,7 @@ const RuletaModal = ({ isOpen, onClose, sesionId, isSidePanel = false }) => {
     setSpinCompleted(false);
     setPuntos('');
     setDescripcion('Participación en clase.');
+    submitLockRef.current = false;
     if (spinInterval.current) clearInterval(spinInterval.current);
   };
 
@@ -110,7 +112,8 @@ const RuletaModal = ({ isOpen, onClose, sesionId, isSidePanel = false }) => {
 
   const manejarEnvio = async (e) => {
     e.preventDefault();
-    if (!seleccionado || !puntos) return;
+    if (!seleccionado || !puntos || submitLockRef.current) return;
+    submitLockRef.current = true;
     
     try {
       setCalificando(true);
@@ -121,18 +124,15 @@ const RuletaModal = ({ isOpen, onClose, sesionId, isSidePanel = false }) => {
         puntos: Number(puntos),
         descripcion
       });
-      
-      setSuccessMsg('¡Calificación guardada exitosamente!');
-      
-      // Limpiar formulario y cerrar después de 2 segundos
-      setTimeout(() => {
-        onClose();
-        reiniciarEstado();
-      }, 2000);
+
+      // Cerrar de inmediato para evitar esperas y dobles clics
+      onClose();
+      reiniciarEstado();
       
     } catch (err) {
       console.error('Error al guardar participación:', err);
       setError(err.response?.data?.error || 'Ocurrió un error al guardar la calificación.');
+      submitLockRef.current = false;
     } finally {
       setCalificando(false);
     }

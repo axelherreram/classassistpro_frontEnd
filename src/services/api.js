@@ -28,10 +28,19 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      // Si el token expira o es inválido, podrías redirigir al login
+      const requestUrl = error.config?.url || '';
+      const esFlujoRegistroQR = requestUrl.includes('/asistencias/marcar');
+
       localStorage.removeItem('token');
       localStorage.removeItem('user'); // Also removing user just in case
-      window.location.href = '/';
+
+      if (esFlujoRegistroQR) {
+        // Solo para QR vencido/401 en registro de asistencia
+        window.location.replace('about:blank');
+      } else {
+        // Flujo normal: volver al login
+        window.location.href = '/';
+      }
     }
     return Promise.reject(error);
   }
