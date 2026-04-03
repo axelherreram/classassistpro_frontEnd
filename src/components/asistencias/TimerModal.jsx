@@ -9,10 +9,61 @@ const TimerModal = ({ isOpen, onClose, isSidePanel = false }) => {
   const [isFinished, setIsFinished] = useState(false);
   
   const timerRef = useRef(null);
+  const alarmIntervalRef = useRef(null);
+  const alarmAudioRef = useRef(null);
+
+  const playAlarm = () => {
+    try {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) return;
+
+      if (!alarmAudioRef.current) {
+        alarmAudioRef.current = new AudioContextClass();
+      }
+
+      const audioContext = alarmAudioRef.current;
+
+      if (audioContext.state === 'suspended') {
+        audioContext.resume();
+      }
+
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+
+      oscillator.type = 'square';
+      oscillator.frequency.setValueAtTime(880, audioContext.currentTime);
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+
+      gainNode.gain.setValueAtTime(0.001, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.4, audioContext.currentTime + 0.03);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.18);
+
+      oscillator.start();
+      oscillator.stop(audioContext.currentTime + 0.2);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const stopAlarm = () => {
+    if (alarmIntervalRef.current) {
+      clearInterval(alarmIntervalRef.current);
+      alarmIntervalRef.current = null;
+    }
+
+    if (alarmAudioRef.current) {
+      if (alarmAudioRef.current.state !== 'closed') {
+        alarmAudioRef.current.close().catch(() => {});
+      }
+      alarmAudioRef.current = null;
+    }
+  };
 
   useEffect(() => {
     if (!isOpen) {
       clearInterval(timerRef.current);
+      stopAlarm();
       setTimeout(() => setIsRunning(false), 0);
     }
   }, [isOpen]);
@@ -29,12 +80,9 @@ const TimerModal = ({ isOpen, onClose, isSidePanel = false }) => {
         setIsFinished(true);
       }, 0);
       
-      // Play sound
-      try {
-        const audio = new Audio('/notification.mp3');
-        audio.play().catch(e => console.log('Audio play failed', e));
-      } catch(error) { 
-        console.error(error); 
+      if (!alarmIntervalRef.current) {
+        playAlarm();
+        alarmIntervalRef.current = setInterval(playAlarm, 950);
       }
     }
     return () => clearInterval(timerRef.current);
@@ -71,6 +119,7 @@ const TimerModal = ({ isOpen, onClose, isSidePanel = false }) => {
   const handleStop = () => {
     setIsRunning(false);
     setIsFinished(false);
+    stopAlarm();
     const min = parseInt(minutes) || 0;
     const sec = parseInt(seconds) || 0;
     setTimeLeft(min * 60 + sec);
@@ -151,7 +200,8 @@ const TimerModal = ({ isOpen, onClose, isSidePanel = false }) => {
             {!isRunning ? (
               <button
                 onClick={handleStart}
-                className="flex-1 flex items-center justify-center gap-2 py-3 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl shadow-md transition-all active:scale-95"
+                disabled={isFinished}
+                className={`flex-1 flex items-center justify-center gap-2 py-3 font-bold rounded-xl shadow-md transition-all ${isFinished ? 'bg-orange-300 text-white/70 cursor-not-allowed' : 'bg-orange-500 hover:bg-orange-600 text-white active:scale-95'}`}
               >
                 <Play size={20} /> Iniciar
               </button>
