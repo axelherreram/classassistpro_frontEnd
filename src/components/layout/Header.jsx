@@ -7,6 +7,12 @@ export default function Header({ toggleSidebar }) {
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
 
+  // Extraer datos del usuario del localStorage
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const nombreUsuario = user.nombre || 'Catedrático';
+  const inicial = nombreUsuario.charAt(0).toUpperCase();
+  const rolDisplay = user.rol === 'ADMIN' ? 'Administrador' : 'Profesor';
+
   const handleLogout = () => {
     localStorage.removeItem('token');
     navigate('/');
@@ -37,19 +43,19 @@ export default function Header({ toggleSidebar }) {
           className="flex items-center gap-3 pl-2 pr-1 py-1 rounded-full hover:bg-gray-50 transition-colors"
         >
           <div className="hidden md:flex flex-col items-end">
-            <span className="text-sm font-medium text-gray-900 leading-none mb-1">Catedrático</span>
-            <span className="text-xs text-gray-500 leading-none">Profesor</span>
+            <span className="text-sm font-medium text-gray-900 leading-none mb-1">{nombreUsuario}</span>
+            <span className="text-xs text-gray-500 leading-none">{rolDisplay}</span>
           </div>
           <div className="w-9 h-9 bg-green-50 text-[#2d7a5d] border border-green-200 rounded-full flex items-center justify-center font-bold text-sm">
-            C
+            {inicial}
           </div>
         </button>
 
         {isOpen && (
           <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 py-1.5 overflow-hidden origin-top-right transition-all">
             <div className="px-4 py-3 border-b border-gray-100/80 bg-gray-50/50">
-              <p className="text-sm font-semibold text-gray-900">Perfil de Usuario</p>
-              <p className="text-xs text-gray-500 truncate mt-0.5">conectado</p>
+              <p className="text-sm font-semibold text-gray-900 truncate">{nombreUsuario}</p>
+              <p className="text-xs text-gray-500 truncate mt-0.5">{user.correo || 'conectado'}</p>
             </div>
             
             <div className="p-1.5">

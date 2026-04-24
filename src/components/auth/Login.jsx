@@ -37,11 +37,25 @@ const Login = () => {
       // Guardar el token en localStorage
       if (data && data.token) {
         localStorage.setItem('token', data.token);
+        
+        // Decodificar payload del JWT para obtener el rol
+        let userRole = 'CATEDRATICO';
+        try {
+          const payloadBase64 = data.token.split('.')[1];
+          if (payloadBase64) {
+            const decodedPayload = JSON.parse(atob(payloadBase64));
+            userRole = decodedPayload.role;
+          }
+        } catch (e) {
+          console.error('No se pudo decodificar el token');
+        }
+
         // Guardar información del usuario
         localStorage.setItem('user', JSON.stringify({
           nombre: data.nombre,
           correo: data.correo,
-          actualizoContra: data.actualizoContra
+          actualizoContra: data.actualizoContra,
+          rol: userRole
         }));
       } else {
         localStorage.setItem('token', 'token_temporal_por_si_acaso');
@@ -54,8 +68,12 @@ const Login = () => {
         toast.error('Por seguridad, debes cambiar tu correo o contraseña por defecto.');
         navigate('/dashboard/perfil', { state: { forceUpdate: true } });
       } else {
-        // Redirigir al dashboard
-        navigate('/dashboard');
+        // Redirigir según el rol
+        if (userRole === 'ADMIN') {
+          navigate('/dashboard/catedraticos');
+        } else {
+          navigate('/dashboard');
+        }
       }
       
     } catch (err) {

@@ -9,6 +9,7 @@ import Asistencias from './components/asistencias/Asistencias';
 import PantallaClase from './components/asistencias/PantallaClase';
 import RegistroAsistencia from './components/asistencias/RegistroAsistencia';   
 import Perfil from './components/perfil/Perfil';
+import Catedraticos from './components/administrador/Catedraticos';
 
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem('token');
@@ -77,7 +78,10 @@ function App() {
                   <Route path="/clases/:id" element={<DetalleClase />} />       
                   <Route path="/estudiantes" element={<Estudiantes />} />       
                   <Route path="/asistencias" element={<Asistencias />} />
-                  <Route path="/proyectar/:sesionId" element={<PantallaClase />} />                  <Route path="/perfil" element={<Perfil />} />                </Routes>
+                  <Route path="/proyectar/:sesionId" element={<PantallaClase />} />
+                  <Route path="/perfil" element={<Perfil />} />
+                  <Route path="/catedraticos" element={<Catedraticos />} />
+                </Routes>
               </ProtectedRoute>
             }
           />

@@ -18,7 +18,18 @@ export default function Dashboard() {
   });
   const [loading, setLoading] = useState(true);
 
+  // Redirigir al admin fuera del panel de catedráticos si entra por URL
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const isAdmin = user.rol === 'ADMIN';
+
+  useEffect(() => {
+    if (isAdmin) {
+      navigate('/dashboard/catedraticos');
+    }
+  }, [isAdmin, navigate]);
+
   const cargarMetricas = async () => {
+    if (isAdmin) return; // Evitar llamada a métricas si es admin
     try {
       setLoading(true);
       const data = await dashboardService.obtenerMetricas();
@@ -38,6 +49,8 @@ export default function Dashboard() {
     toast.success('¡Clase creada exitosamente!');
     cargarMetricas();
   };
+
+  if (isAdmin) return null; // Prevenir renderizado fugaz mientras redirige
 
   return (
     <DashboardLayout>

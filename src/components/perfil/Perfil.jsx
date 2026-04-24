@@ -98,9 +98,9 @@ const Perfil = () => {
 
   return (
     <DashboardLayout>
-      <div className="max-w-3xl mx-auto p-6">
-        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="p-8 border-b border-gray-100 bg-[#2d7a5d] text-white flex items-center gap-4">
+      <div className="max-w-3xl mx-auto p-2 sm:p-6 pb-20 sm:pb-6">
+        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-sm border sm:border-gray-100 overflow-hidden">
+          <div className="p-5 sm:p-8 border-b border-gray-100 bg-[#2d7a5d] text-white flex items-center gap-3 sm:gap-4">
             <div className="p-3 bg-white/10 rounded-xl">
               <User className="w-8 h-8" />
             </div>
@@ -110,9 +110,9 @@ const Perfil = () => {
             </div>
           </div>
 
-          <div className="p-8">
+          <div className="p-4 sm:p-8">
             {forceUpdate && (
-              <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-start gap-3 text-amber-800">
+              <div className="mb-6 p-3 sm:p-4 bg-amber-50 border border-amber-200 rounded-2xl flex flex-col sm:flex-row items-start gap-3 text-amber-800">
                 <AlertTriangle className="shrink-0 mt-0.5" />
                 <div>
                   <h3 className="font-bold">Actualización de seguridad requerida</h3>
@@ -125,11 +125,11 @@ const Perfil = () => {
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <h3 className="text-base sm:text-lg font-bold text-gray-800 mb-2 sm:mb-4 flex items-center gap-2">
                   <User className="w-5 h-5 text-[#2d7a5d]" />
                   Actualizar Nombre (Opcional)
                 </h3>
-                <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200">
+                <div className="bg-gray-50 p-3 sm:p-4 rounded-2xl border border-gray-200">
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">Tu Nombre Completo</label>
                   <input
                     type="text"
@@ -143,11 +143,11 @@ const Perfil = () => {
               </div>
 
               <div>
-                <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <h3 className="text-base sm:text-lg font-bold text-gray-800 mb-2 sm:mb-4 flex items-center gap-2">
                   <Mail className="w-5 h-5 text-[#2d7a5d]" />
                   Actualizar Correo (Opcional)
                 </h3>
-                <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200">
+                <div className="bg-gray-50 p-3 sm:p-4 rounded-2xl border border-gray-200">
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">Nuevo Correo Electrónico</label>
                   <input
                     type="email"
@@ -161,11 +161,11 @@ const Perfil = () => {
               </div>
 
               <div>
-                <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <h3 className="text-base sm:text-lg font-bold text-gray-800 mb-2 sm:mb-4 flex items-center gap-2">
                   <Lock className="w-5 h-5 text-[#2d7a5d]" />
                   Actualizar Contraseña
                 </h3>
-                <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200 space-y-4">
+                <div className="bg-gray-50 p-3 sm:p-5 rounded-2xl border border-gray-200 space-y-3 sm:space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">
                       Contraseña Actual {forceUpdate && <span className="text-red-500">*</span>}
@@ -213,7 +213,7 @@ const Perfil = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex items-center gap-2 px-8 py-3 bg-[#2d7a5d] hover:bg-[#225d46] text-white rounded-xl font-medium shadow-sm transition-colors disabled:opacity-70"
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-3 bg-[#2d7a5d] hover:bg-[#225d46] text-white rounded-xl font-medium shadow-sm transition-colors disabled:opacity-70"
                 >
                   <Save size={20} />
                   {loading ? 'Guardando...' : 'Guardar Cambios'}
