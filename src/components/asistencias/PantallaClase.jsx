@@ -35,10 +35,16 @@ export default function PantallaClase() {
   // Noise Meter State
   const [noiseLevel, setNoiseLevel] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
+  const [sensitivity, setSensitivity] = useState(1.0);
   const audioContextRef = useRef(null);
   const analyserRef = useRef(null);
   const microphoneRef = useRef(null);
   const rafRef = useRef(null);
+  const sensitivityRef = useRef(1.0);
+
+  useEffect(() => {
+    sensitivityRef.current = sensitivity;
+  }, [sensitivity]);
 
   // Funciones de Ruido
   const startNoiseMeter = async () => {
@@ -64,7 +70,7 @@ export default function PantallaClase() {
         }
         const average = sum / dataArray.length;
         // Normalize 0 to 100 roughly
-        setNoiseLevel(Math.min(100, Math.round((average / 128) * 100)));
+        setNoiseLevel(Math.min(100, Math.round((average / 128) * 100 * sensitivityRef.current)));
         rafRef.current = requestAnimationFrame(updateNoise);
       };
       updateNoise();
@@ -294,7 +300,7 @@ export default function PantallaClase() {
 
           {activeTool === 'noise' && (
             <div className="flex flex-col items-center justify-center w-full max-w-3xl animate-fade-in z-10">
-              <div className="flex flex-col items-center mb-12 gap-6">
+              <div className="flex flex-col items-center mb-8 gap-6">
                 <h2 className="text-5xl font-bold text-white flex items-center gap-4">
                   <Activity className={`w-12 h-12 ${noiseLevel > 75 ? 'text-red-500 animate-pulse' : 'text-emerald-400'}`} />
                 Medidor de Ruido
@@ -307,6 +313,22 @@ export default function PantallaClase() {
                 >
                   {isRecording ? 'Apagar Micrófono' : 'Encender Micrófono'}
                 </button>
+              </div>
+
+              <div className="flex flex-col w-full max-w-md bg-gray-800 p-5 rounded-3xl border border-gray-700 shadow-xl mb-8 gap-3">
+                <div className="flex justify-between items-center text-sm font-medium">
+                  <span className="text-gray-400">Sensibilidad</span>
+                  <span className="text-emerald-400 font-bold bg-gray-900 px-3 py-1 rounded-lg border border-gray-700">{sensitivity.toFixed(1)}x</span>
+                </div>
+                <input 
+                  type="range" 
+                  min="0.1" 
+                  max="3" 
+                  step="0.1" 
+                  value={sensitivity} 
+                  onChange={(e) => setSensitivity(parseFloat(e.target.value))}
+                  className="w-full accent-emerald-500 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                />
               </div>
               
               <div className="w-full bg-gray-800 rounded-full h-24 p-2 shadow-inner overflow-hidden border border-gray-700">

@@ -26,6 +26,10 @@ export default function RegistroAsistencia() {
   useEffect(() => {
     const loadModels = async () => {
       try {
+        // Inicializar el backend de TensorFlow explícitamente antes de cargar modelos
+        await faceapi.tf.setBackend('webgl');
+        await faceapi.tf.ready();
+        
         await faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/');
         setModelosCargados(true);
       } catch (error) {
@@ -97,7 +101,7 @@ export default function RegistroAsistencia() {
       const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions());
       
       if (!detections || detections.length === 0) {
-         toast.error('❌ No se detectó ningún rostro vivo. ¡Asegúrate de mirar a la cámara!');
+         toast.error('❌ No se detectó ningún rostro. ¡Asegúrate de mirar a la cámara!');
          setAnalizandoRostro(false);
          return;
       }
@@ -244,7 +248,7 @@ export default function RegistroAsistencia() {
       <div className="w-full max-w-lg bg-white rounded-3xl overflow-hidden shadow-2xl animate-fade-in">
         <div className="bg-[#2d7a5d] p-6 text-center">
           <h1 className="text-2xl font-bold text-white">Registro de Asistencia</h1>
-          <p className="text-emerald-100 text-sm mt-1">Verificación con Selfie</p>
+          <p className="text-emerald-100 text-sm mt-1">Verificación de Rostro</p>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-6">
@@ -322,6 +326,12 @@ export default function RegistroAsistencia() {
                 >
                   <X className="w-5 h-5" />
                 </button>
+                {/* Instrucción animada */}
+                {modelosCargados && (
+                  <div className="absolute top-16 inset-x-0 mx-auto w-max px-4 py-2 bg-emerald-500/90 text-white text-sm font-semibold rounded-full shadow-lg backdrop-blur animate-pulse">
+                    📸 ¡Mira a la cámara para tomar la foto!
+                  </div>
+                )}
               </div>
             )}
 
