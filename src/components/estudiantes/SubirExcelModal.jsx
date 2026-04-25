@@ -14,9 +14,9 @@ export default function SubirExcelModal({ isOpen, onClose, claseId, onSuccess })
     const selectedFile = e.target.files[0];
     if (selectedFile) {
       if (
-        selectedFile.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || 
+        selectedFile.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
         selectedFile.type === 'application/vnd.ms-excel' ||
-        selectedFile.name.endsWith('.xlsx') || 
+        selectedFile.name.endsWith('.xlsx') ||
         selectedFile.name.endsWith('.xls')
       ) {
         setFile(selectedFile);
@@ -37,9 +37,9 @@ export default function SubirExcelModal({ isOpen, onClose, claseId, onSuccess })
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const droppedFile = e.dataTransfer.files[0];
       if (
-        droppedFile.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || 
+        droppedFile.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
         droppedFile.type === 'application/vnd.ms-excel' ||
-        droppedFile.name.endsWith('.xlsx') || 
+        droppedFile.name.endsWith('.xlsx') ||
         droppedFile.name.endsWith('.xls')
       ) {
         setFile(droppedFile);
@@ -73,13 +73,13 @@ export default function SubirExcelModal({ isOpen, onClose, claseId, onSuccess })
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm transition-opacity">
-      <div 
+      <div
         className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-fade-in-up"
         onClick={e => e.stopPropagation()}
       >
         <div className="flex justify-between items-center p-6 border-b border-gray-100 bg-gray-50/50">
           <h3 className="text-xl font-bold text-gray-900">Importar Estudiantes</h3>
-          <button 
+          <button
             onClick={onClose}
             className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
           >
@@ -97,22 +97,21 @@ export default function SubirExcelModal({ isOpen, onClose, claseId, onSuccess })
                 <br />
                 <span className="font-semibold bg-white px-1.5 py-0.5 rounded text-xs mt-1 inline-block">carnet</span>, {' '}
                 <span className="font-semibold bg-white px-1.5 py-0.5 rounded text-xs mt-1 inline-block">nombre</span>, {' '}
-                <span className="font-semibold bg-white px-1.5 py-0.5 rounded text-xs mt-1 inline-block">correo</span> (opcional)
+                <span className="font-semibold bg-white px-1.5 py-0.5 rounded text-xs mt-1 inline-block">correo</span>
               </p>
             </div>
           </div>
 
           <form onSubmit={handleSubmit}>
-            <div 
-              className={`border-2 border-dashed rounded-2xl p-8 text-center transition-all ${
-                file 
-                ? 'border-[#2d7a5d] bg-[#2d7a5d]/5' 
+            <div
+              className={`border-2 border-dashed rounded-2xl p-8 text-center transition-all ${file
+                ? 'border-[#2d7a5d] bg-[#2d7a5d]/5'
                 : 'border-gray-300 hover:border-[#2d7a5d]/50 hover:bg-gray-50'
-              }`}
+                }`}
               onDragOver={handleDragOver}
               onDrop={handleDrop}
             >
-              <input 
+              <input
                 type="file"
                 ref={fileInputRef}
                 onChange={handleFileChange}
@@ -120,8 +119,8 @@ export default function SubirExcelModal({ isOpen, onClose, claseId, onSuccess })
                 className="hidden"
                 id="excel-upload"
               />
-              
-              <label 
+
+              <label
                 htmlFor="excel-upload"
                 className="cursor-pointer flex flex-col items-center justify-center gap-4"
               >

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import DashboardLayout from '../layout/DashboardLayout';
-import { Calendar, BookOpen, Plus, QrCode, Search, CheckCircle2, Clock, Users, XCircle, Maximize, CheckCheck } from 'lucide-react';
+import { Calendar, BookOpen, Plus, QrCode, CheckCircle2, Clock, Users, XCircle, Maximize, CheckCheck, Trophy } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { claseService } from '../../services/clase.service';
 import { asistenciaService } from '../../services/asistencia.service';
@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import NuevaSesionModal from './NuevaSesionModal';
 import GenerarQRModal from './GenerarQRModal';
 import DetallesSesionModal from './DetallesSesionModal';
+import DesempenoModal from './DesempenoModal';
 
 export default function Asistencias() {
   const navigate = useNavigate();
@@ -18,6 +19,10 @@ export default function Asistencias() {
   const [loadingSesiones, setLoadingSesiones] = useState(false);
   const [finalizandoId, setFinalizandoId] = useState(null);
   const [confirmandoId, setConfirmandoId] = useState(null);
+
+  // Modal Desempeño por sesión
+  const [isDesempenoModalOpen, setIsDesempenoModalOpen] = useState(false);
+  const [sesionSeleccionadaParaDesempeno, setSesionSeleccionadaParaDesempeno] = useState(null);
 
   // Modals
   const [isNuevaSesionModalOpen, setIsNuevaSesionModalOpen] = useState(false);  
@@ -312,9 +317,16 @@ export default function Asistencias() {
                         )}
 
                         {esFinalizada && (
-                          <div className="text-center text-xs text-gray-400 py-1">
-                            Sesión cerrada — solo consulta disponible
-                          </div>
+                          <button
+                            onClick={() => {
+                              setSesionSeleccionadaParaDesempeno(sesion.id);
+                              setIsDesempenoModalOpen(true);
+                            }}
+                            className="w-full flex justify-center items-center gap-1.5 py-2 text-xs font-semibold rounded-lg bg-amber-50 border border-amber-200 text-amber-700 hover:bg-amber-100 transition-colors"
+                          >
+                            <Trophy className="w-3.5 h-3.5" />
+                            Ver Desempeño de Sesión
+                          </button>
                         )}
                       </div>
                     </div>
@@ -349,6 +361,15 @@ export default function Asistencias() {
           setSesionSeleccionadaParaLista(null);
         }}
         sesionId={sesionSeleccionadaParaLista}
+      />
+
+      <DesempenoModal
+        isOpen={isDesempenoModalOpen}
+        onClose={() => {
+          setIsDesempenoModalOpen(false);
+          setSesionSeleccionadaParaDesempeno(null);
+        }}
+        sesionId={sesionSeleccionadaParaDesempeno}
       />
     </DashboardLayout>
   );

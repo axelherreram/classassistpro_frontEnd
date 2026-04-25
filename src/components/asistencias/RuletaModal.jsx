@@ -65,8 +65,7 @@ const RuletaModal = ({ isOpen, onClose, sesionId, isSidePanel = false, isEmbedde
       setSeleccionado(response.seleccionado);
       setCurrentEstudiante(response.presentes[0] || null);
     } catch (err) {
-      console.error('Error al cargar ruleta:', err);
-      setError(err.response?.data?.error || 'No se pudo cargar la ruleta. Asegúrate de que haya alumnos con asistencia.');
+      setError(err.response?.data?.error || err.message || 'No se pudo cargar la ruleta. Asegúrate de que haya alumnos con asistencia.');
     } finally {
       setLoading(false);
     }
