@@ -139,10 +139,13 @@ export default function PantallaClase() {
   }, [activeTool]);
   
   const handleToolClick = (tool) => {
+    if (tool === 'timer') {
+      setIsTimerOpen((prev) => !prev);
+      return;
+    }
     setActiveTool(tool);
     setIsRuletaOpen(tool === 'ruleta');
     setIsGruposOpen(tool === 'grupos');
-    setIsTimerOpen(tool === 'timer');
     setIsDesempenoOpen(tool === 'desempeno');
   };
 
@@ -200,7 +203,7 @@ export default function PantallaClase() {
           />
           <MenuButton 
             icon={<Timer />} label="Tiempo" 
-            active={activeTool === 'timer'} 
+            active={isTimerOpen} 
             onClick={() => handleToolClick('timer')} 
             color="text-orange-400"
           />
@@ -355,20 +358,16 @@ export default function PantallaClase() {
           )}
 
           {/* Placeholder for when Modals are open, showing what tool is active in background */}
-          {(activeTool === 'ruleta' || activeTool === 'grupos' || activeTool === 'timer' || activeTool === 'desempeno' || activeTool === 'desempeno') && (
+          {(activeTool === 'ruleta' || activeTool === 'grupos' || activeTool === 'desempeno') && (
             <div className="text-white z-10 flex flex-col items-center opacity-50">
                {activeTool === 'ruleta' && <Dices className="w-32 h-32 mb-4 text-purple-400" />}
                {activeTool === 'grupos' && <UsersRound className="w-32 h-32 mb-4 text-teal-400" />}
-               {activeTool === 'timer' && <Timer className="w-32 h-32 mb-4 text-orange-400" />}
-               {activeTool === 'desempeno' && <Trophy className="w-32 h-32 mb-4 text-yellow-400" />}
                {activeTool === 'desempeno' && <Trophy className="w-32 h-32 mb-4 text-yellow-400" />}
                <h2 className="text-3xl font-bold">Usando herramienta...</h2>
                <button 
                  onClick={() => {
                    if(activeTool === 'ruleta') setIsRuletaOpen(true);
                    if(activeTool === 'grupos') setIsGruposOpen(true);
-                   if(activeTool === 'timer') setIsTimerOpen(true);
-                   if(activeTool === 'desempeno') setIsDesempenoOpen(true);
                    if(activeTool === 'desempeno') setIsDesempenoOpen(true);
                  }}
                  className="mt-6 px-6 py-3 bg-gray-800 rounded-xl hover:bg-gray-700 transition"
@@ -398,7 +397,8 @@ export default function PantallaClase() {
       />
       <TimerModal
         isOpen={isTimerOpen}
-        onClose={() => { setIsTimerOpen(false); setActiveTool('home'); }}
+        onClose={() => setIsTimerOpen(false)}
+        isSidePanel={true}
       />
     </div>
   );

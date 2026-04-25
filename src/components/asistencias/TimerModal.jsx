@@ -134,8 +134,8 @@ const TimerModal = ({ isOpen, onClose, isSidePanel = false }) => {
   if (!isOpen) return null;
 
   return (
-    <div className={isSidePanel ? "fixed top-0 right-0 bottom-0 w-full sm:w-[450px] shadow-2xl z-[150] bg-white border-l border-gray-200 flex flex-col transform transition-transform duration-300 animate-in slide-in-from-right-8" : "fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 shadow-2xl backdrop-blur-sm"}>
-      <div className={isSidePanel ? "w-full h-full flex flex-col overflow-hidden" : "bg-white rounded-3xl shadow-xl w-full max-w-sm overflow-hidden flex flex-col"}>
+    <div className={isSidePanel ? "fixed bottom-6 right-6 w-full max-w-[380px] shadow-2xl z-[150] transform transition-transform duration-300 animate-in slide-in-from-bottom-8" : "fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 shadow-2xl backdrop-blur-sm"}>
+      <div className={isSidePanel ? "bg-white rounded-3xl shadow-xl w-full overflow-hidden flex flex-col border border-gray-200" : "bg-white rounded-3xl shadow-xl w-full max-w-sm overflow-hidden flex flex-col"}>
         {/* Header */}
         <div className="flex items-center justify-between p-4 bg-gradient-to-r from-orange-500 to-red-500 text-white">
           <div className="flex items-center gap-2">
