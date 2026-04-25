@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import DashboardLayout from '../layout/DashboardLayout';
-import { Calendar, BookOpen, Plus, QrCode, Search, CheckCircle2, Clock, Users, Dices, UsersRound , Timer, Maximize } from 'lucide-react';
+import { Calendar, BookOpen, Plus, QrCode, Search, CheckCircle2, Clock, Users, XCircle, Maximize, CheckCheck } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { claseService } from '../../services/clase.service';
 import { asistenciaService } from '../../services/asistencia.service';
@@ -16,6 +16,8 @@ export default function Asistencias() {
   const [sesiones, setSesiones] = useState([]);
   const [loadingClases, setLoadingClases] = useState(true);
   const [loadingSesiones, setLoadingSesiones] = useState(false);
+  const [finalizandoId, setFinalizandoId] = useState(null);
+  const [confirmandoId, setConfirmandoId] = useState(null);
 
   // Modals
   const [isNuevaSesionModalOpen, setIsNuevaSesionModalOpen] = useState(false);  
@@ -68,6 +70,40 @@ export default function Asistencias() {
   const handleVerAsistencias = (sesionId) => {
     setSesionSeleccionadaParaLista(sesionId);
     setIsListaModalOpen(true);
+  };
+
+  const handleFinalizarSesion = async (sesionId) => {
+    try {
+      setFinalizandoId(sesionId);
+      await asistenciaService.finalizarSesion(sesionId);
+      toast.success('Sesión finalizada correctamente');
+      setConfirmandoId(null);
+      // Actualizar estado localmente sin recargar todo
+      setSesiones(prev =>
+        prev.map(s => s.id === sesionId ? { ...s, estado: 'finalizada' } : s)
+      );
+    } catch (error) {
+      toast.error(error.message || 'Error al finalizar la sesión');
+    } finally {
+      setFinalizandoId(null);
+    }
+  };
+
+  const EstadoBadge = ({ estado }) => {
+    if (estado === 'finalizada') {
+      return (
+        <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-gray-100 text-gray-500 border border-gray-200">
+          <XCircle className="w-3 h-3" />
+          Finalizada
+        </span>
+      );
+    }
+    return (
+      <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+        <CheckCircle2 className="w-3 h-3" />
+        Activa
+      </span>
+    );
   };
 
   return (
@@ -160,49 +196,130 @@ export default function Asistencias() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {sesiones.map((sesion) => (
-                  <div key={sesion.id} className="bg-white rounded-2xl p-6 shadow-[0_2px_10px_rgb(0,0,0,0.02)] border border-gray-100 hover:border-gray-200 transition-all flex flex-col">
-                     <div className="flex justify-between items-start mb-4">    
+                {sesiones.map((sesion) => {
+                  const esFinalizada = sesion.estado === 'finalizada';
+                  const estaConfirmando = confirmandoId === sesion.id;
+                  const estaFinalizando = finalizandoId === sesion.id;
+
+                  return (
+                    <div
+                      key={sesion.id}
+                      className={`bg-white rounded-2xl p-6 shadow-[0_2px_10px_rgb(0,0,0,0.02)] border transition-all flex flex-col ${
+                        esFinalizada ? 'border-gray-200 opacity-80' : 'border-gray-100 hover:border-gray-200'
+                      }`}
+                    >
+                      {/* Header: fecha + estado */}
+                      <div className="flex justify-between items-start mb-3">    
                         <div className="flex items-center gap-2 text-gray-500 text-sm font-medium">
-                          <Clock className="w-4 h-4" />
+                          <Clock className="w-4 h-4 shrink-0" />
                           {new Date(sesion.fecha + 'T00:00:00').toLocaleDateString('es-ES', {
                             weekday: 'long',
                             day: 'numeric',
                             month: 'long'
                           })}
                         </div>
-                        <button
-                          onClick={() => navigate(`/dashboard/proyectar/${sesion.id}`)}
-                          className="flex items-center gap-1 text-xs py-1.5 px-3 bg-[#2d7a5d] hover:bg-emerald-700 text-white rounded-full font-medium transition shadow-sm"
-                          title="Pantalla de Clase"
-                        >
-                          <Maximize className="w-3 h-3" /> Proyectar
-                        </button>
-                     </div>
-                     <h3 className="font-bold text-gray-900 text-lg mb-2 line-clamp-2 min-h-[3.5rem]">
-                       {sesion.tema || 'Sesión Regular'}
-                     </h3>
+                        <EstadoBadge estado={sesion.estado || 'creada'} />
+                      </div>
 
-                     <div className="mt-auto pt-4 flex flex-wrap gap-2 w-full border-t border-gray-50">
-                        <button
-                          onClick={() => handleVerAsistencias(sesion.id)}       
-                          className="flex-[1_1_100%] sm:flex-1 flex justify-center items-center gap-1 py-2 px-2 bg-[#f4f7fb] text-gray-700 text-xs font-semibold rounded-lg hover:bg-gray-100 transition-colors"
-                        >
-                          <Users className="w-4 h-4" /> Ver
-                        </button>
-                        
-                        <button
-                          onClick={() => {
-                            setSesionSeleccionadaParaQr(sesion.id);
-                            setIsQrModalOpen(true);
-                          }}
-                          className="flex-[1_1_100%] sm:flex-1 flex justify-center items-center gap-1 py-2 px-2 bg-[#2d7a5d]/10 text-[#2d7a5d] text-xs font-semibold rounded-lg hover:bg-[#2d7a5d]/20 border border-[#2d7a5d]/20 transition-colors"
-                        >
-                          <QrCode className="w-4 h-4" /> QR
-                        </button>
-                     </div>
-                  </div>
-                ))}
+                      {/* Tema */}
+                      <h3 className="font-bold text-gray-900 text-lg mb-4 line-clamp-2 min-h-[3.5rem]">
+                        {sesion.tema || 'Sesión Regular'}
+                      </h3>
+
+                      {/* Acciones */}
+                      <div className="mt-auto pt-4 flex flex-col gap-2 border-t border-gray-50">
+                        {/* Fila: Ver asistencias + QR + Proyectar */}
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleVerAsistencias(sesion.id)}       
+                            className="flex-1 flex justify-center items-center gap-1 py-2 px-2 bg-[#f4f7fb] text-gray-700 text-xs font-semibold rounded-lg hover:bg-gray-100 transition-colors"
+                          >
+                            <Users className="w-4 h-4" /> Ver
+                          </button>
+                          
+                          <button
+                            onClick={() => {
+                              if (esFinalizada) {
+                                toast.error('No puedes generar QR para una sesión finalizada.');
+                                return;
+                              }
+                              setSesionSeleccionadaParaQr(sesion.id);
+                              setIsQrModalOpen(true);
+                            }}
+                            disabled={esFinalizada}
+                            className={`flex-1 flex justify-center items-center gap-1 py-2 px-2 text-xs font-semibold rounded-lg border transition-colors ${
+                              esFinalizada
+                                ? 'bg-gray-50 text-gray-300 border-gray-100 cursor-not-allowed'
+                                : 'bg-[#2d7a5d]/10 text-[#2d7a5d] border-[#2d7a5d]/20 hover:bg-[#2d7a5d]/20'
+                            }`}
+                          >
+                            <QrCode className="w-4 h-4" /> QR
+                          </button>
+
+                          <button
+                            onClick={() => {
+                              if (esFinalizada) {
+                                toast.error('Esta sesión está finalizada.');
+                                return;
+                              }
+                              navigate(`/dashboard/proyectar/${sesion.id}`);
+                            }}
+                            disabled={esFinalizada}
+                            className={`flex-1 flex justify-center items-center gap-1 py-2 px-2 text-xs font-semibold rounded-lg transition-colors ${
+                              esFinalizada
+                                ? 'bg-gray-50 text-gray-300 cursor-not-allowed'
+                                : 'bg-[#2d7a5d] hover:bg-emerald-700 text-white'
+                            }`}
+                            title="Pantalla de Clase"
+                          >
+                            <Maximize className="w-3 h-3" /> Proyectar
+                          </button>
+                        </div>
+
+                        {/* Botón finalizar */}
+                        {!esFinalizada && (
+                          estaConfirmando ? (
+                            <div className="flex gap-2 animate-fade-in">
+                              <button
+                                onClick={() => setConfirmandoId(null)}
+                                className="flex-1 py-2 text-xs font-semibold rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors"
+                              >
+                                Cancelar
+                              </button>
+                              <button
+                                onClick={() => handleFinalizarSesion(sesion.id)}
+                                disabled={estaFinalizando}
+                                className="flex-1 flex justify-center items-center gap-1 py-2 text-xs font-semibold rounded-lg bg-red-500 hover:bg-red-600 text-white transition-colors disabled:opacity-60"
+                              >
+                                {estaFinalizando ? (
+                                  <span className="animate-pulse">Finalizando...</span>
+                                ) : (
+                                  <>
+                                    <CheckCheck className="w-3.5 h-3.5" />
+                                    Confirmar finalizar
+                                  </>
+                                )}
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => setConfirmandoId(sesion.id)}
+                              className="w-full py-2 text-xs font-semibold rounded-lg border border-red-200 text-red-500 hover:bg-red-50 transition-colors"
+                            >
+                              Finalizar Sesión
+                            </button>
+                          )
+                        )}
+
+                        {esFinalizada && (
+                          <div className="text-center text-xs text-gray-400 py-1">
+                            Sesión cerrada — solo consulta disponible
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>

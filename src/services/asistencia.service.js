@@ -63,5 +63,19 @@ export const asistenciaService = {
         throw new Error(error.response.data.error || 'Error al marcar asistencia');
       }
       throw new Error(error.message || 'Error de conexión');
-    }  }
-};
+    }
+  },
+
+  // Finalizar una sesión
+  finalizarSesion: async (sesionId) => {
+    try {
+      const response = await apiClient.patch(`/asistencias/sesion/${sesionId}/finalizar`);
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        throw new Error(error.response.data.error || 'Error al finalizar la sesión');
+      }
+      throw new Error(error.message || 'Error de conexión');
+    }
+  }
+};
