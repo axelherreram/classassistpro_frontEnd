@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Play, Pause, Square, Timer as TimerIcon, Bell } from 'lucide-react';
 
-const TimerModal = ({ isOpen, onClose, isSidePanel = false }) => {
+const TimerModal = ({ isOpen, onClose, isSidePanel = false, isEmbedded = false }) => {
   const [minutes, setMinutes] = useState(5);
   const [seconds, setSeconds] = useState(0);
   const [timeLeft, setTimeLeft] = useState(5 * 60);
@@ -133,24 +133,34 @@ const TimerModal = ({ isOpen, onClose, isSidePanel = false }) => {
 
   if (!isOpen) return null;
 
+  const wrapperClass = isEmbedded 
+    ? "w-full h-full flex items-center justify-center z-10 animate-fade-in"
+    : (isSidePanel ? "fixed bottom-6 right-6 w-full max-w-[380px] shadow-2xl z-[150] transform transition-transform duration-300 animate-in slide-in-from-bottom-8" : "fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 shadow-2xl backdrop-blur-sm");
+
+  const innerClass = isEmbedded
+    ? "bg-white rounded-3xl shadow-2xl w-full max-w-xl overflow-hidden flex flex-col border border-gray-200"
+    : (isSidePanel ? "bg-white rounded-3xl shadow-xl w-full overflow-hidden flex flex-col border border-gray-200" : "bg-white rounded-3xl shadow-xl w-full max-w-sm overflow-hidden flex flex-col");
+
   return (
-    <div className={isSidePanel ? "fixed bottom-6 right-6 w-full max-w-[380px] shadow-2xl z-[150] transform transition-transform duration-300 animate-in slide-in-from-bottom-8" : "fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 shadow-2xl backdrop-blur-sm"}>
-      <div className={isSidePanel ? "bg-white rounded-3xl shadow-xl w-full overflow-hidden flex flex-col border border-gray-200" : "bg-white rounded-3xl shadow-xl w-full max-w-sm overflow-hidden flex flex-col"}>
+    <div className={wrapperClass}>
+      <div className={innerClass}>
         {/* Header */}
         <div className="flex items-center justify-between p-4 bg-gradient-to-r from-orange-500 to-red-500 text-white">
           <div className="flex items-center gap-2">
             <TimerIcon size={24} />
             <h2 className="text-xl font-bold">Temporizador</h2>
           </div>
-          <button
-            onClick={() => {
-              handleStop();
-              onClose();
-            }}
-            className="p-1 rounded-full hover:bg-white/20 transition-colors"
-          >
-            <X size={24} />
-          </button>
+          {!isEmbedded && (
+            <button
+              onClick={() => {
+                handleStop();
+                onClose();
+              }}
+              className="p-1 rounded-full hover:bg-white/20 transition-colors"
+            >
+              <X size={24} />
+            </button>
+          )}
         </div>
 
         {/* Content */}

@@ -3,7 +3,7 @@ import { X, Trophy, Medal, Star, Target, TrendingUp, AlertCircle, RefreshCw, Dow
 import { desempenoService } from '../../services/desempeno.service';
 import ExcelJS from 'exceljs';
 
-const DesempenoModal = ({ isOpen, onClose, sesionId, claseId }) => {
+const DesempenoModal = ({ isOpen, onClose, sesionId, claseId, isEmbedded = false }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [data, setData] = useState(null);
@@ -82,9 +82,17 @@ const DesempenoModal = ({ isOpen, onClose, sesionId, claseId }) => {
 
   if (!isOpen) return null;
 
+  const wrapperClass = isEmbedded 
+    ? "w-full h-full flex items-center justify-center z-10 animate-fade-in p-4" 
+    : "fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 shadow-2xl backdrop-blur-sm";
+
+  const innerClass = isEmbedded
+    ? "bg-white rounded-3xl shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col h-full max-h-[800px] border border-gray-200"
+    : "bg-white rounded-2xl shadow-xl w-full max-w-4xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-300";
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 shadow-2xl backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-4xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-300">
+    <div className={wrapperClass}>
+      <div className={innerClass}>
         
         {/* Header */}
         <div className="flex items-center justify-between p-4 bg-gradient-to-r from-yellow-500 to-amber-600 text-white">
@@ -92,12 +100,14 @@ const DesempenoModal = ({ isOpen, onClose, sesionId, claseId }) => {
             <Trophy size={24} />
             <h2 className="text-xl font-bold">Desempeño de Estudiantes</h2>
           </div>
-          <button
-            onClick={onClose}
-            className="p-1 rounded-full hover:bg-white/20 transition-colors"
-          >
-            <X size={24} />
-          </button>
+          {!isEmbedded && (
+            <button
+              onClick={onClose}
+              className="p-1 rounded-full hover:bg-white/20 transition-colors"
+            >
+              <X size={24} />
+            </button>
+          )}
         </div>
 
         {/* Content */}

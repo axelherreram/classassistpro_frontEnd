@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Users, Shuffle, Award, RefreshCw, Send, CheckCircle, AlertCircle, Settings2, UserPlus } from 'lucide-react';
 import { grupoService } from '../../services/grupo.service';
 
-const GruposModal = ({ isOpen, onClose, sesionId, isSidePanel = false }) => {
+const GruposModal = ({ isOpen, onClose, sesionId, isSidePanel = false, isEmbedded = false }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
@@ -109,21 +109,31 @@ const GruposModal = ({ isOpen, onClose, sesionId, isSidePanel = false }) => {
 
   if (!isOpen) return null;
 
+  const wrapperClass = isEmbedded 
+    ? "w-full h-full flex items-center justify-center z-10 animate-fade-in p-4" 
+    : (isSidePanel ? "fixed top-0 right-0 bottom-0 w-full sm:w-[600px] md:w-[800px] shadow-2xl z-[150] bg-white border-l border-gray-200 flex flex-col transform transition-transform duration-300 animate-in slide-in-from-right-8" : "fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 shadow-2xl backdrop-blur-sm");
+
+  const innerClass = isEmbedded
+    ? "bg-white rounded-3xl shadow-2xl w-full max-w-5xl h-full max-h-[800px] overflow-hidden flex flex-col border border-gray-200"
+    : (isSidePanel ? "w-full h-full flex flex-col overflow-hidden" : "bg-white rounded-2xl shadow-xl w-full max-w-4xl overflow-hidden flex flex-col max-h-[85vh]");
+
   return (
-    <div className={isSidePanel ? "fixed top-0 right-0 bottom-0 w-full sm:w-[600px] md:w-[800px] shadow-2xl z-[150] bg-white border-l border-gray-200 flex flex-col transform transition-transform duration-300 animate-in slide-in-from-right-8" : "fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 shadow-2xl backdrop-blur-sm"}>
-      <div className={isSidePanel ? "w-full h-full flex flex-col overflow-hidden" : "bg-white rounded-2xl shadow-xl w-full max-w-4xl overflow-hidden flex flex-col max-h-[85vh]"}>
+    <div className={wrapperClass}>
+      <div className={innerClass}>
         {/* Header */}
         <div className="flex items-center justify-between p-4 bg-gradient-to-r from-teal-600 to-emerald-700 text-white">
           <div className="flex items-center gap-2">
             <Users size={24} />
             <h2 className="text-xl font-bold">Módulo de Grupos Aleatorios</h2>
           </div>
-          <button
-            onClick={onClose}
-            className="p-1 rounded-full hover:bg-white/20 transition-colors"
-          >
-            <X size={24} />
-          </button>
+          {!isEmbedded && (
+            <button
+              onClick={onClose}
+              className="p-1 rounded-full hover:bg-white/20 transition-colors"
+            >
+              <X size={24} />
+            </button>
+          )}
         </div>
 
         {/* Content */}

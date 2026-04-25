@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { X, Dices, Award, RefreshCw, Send, CheckCircle, AlertCircle } from 'lucide-react';
 import { participacionService } from '../../services/participacion.service';
 
-const RuletaModal = ({ isOpen, onClose, sesionId, isSidePanel = false }) => {
+const RuletaModal = ({ isOpen, onClose, sesionId, isSidePanel = false, isEmbedded = false }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [presentes, setPresentes] = useState([]);
@@ -140,22 +140,32 @@ const RuletaModal = ({ isOpen, onClose, sesionId, isSidePanel = false }) => {
 
   if (!isOpen) return null;
 
+  const wrapperClass = isEmbedded 
+    ? "w-full h-full flex items-center justify-center z-10 animate-fade-in p-4" 
+    : (isSidePanel ? "fixed top-0 right-0 bottom-0 w-full sm:w-[450px] shadow-2xl z-[150] bg-white border-l border-gray-200 flex flex-col transform transition-transform duration-300 animate-in slide-in-from-right-8" : "fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 shadow-2xl backdrop-blur-sm");
+
+  const innerClass = isEmbedded
+    ? "bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col h-full max-h-[700px] border border-gray-200"
+    : (isSidePanel ? "w-full h-full flex flex-col overflow-hidden" : "bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[85vh]");
+
   return (
-    <div className={isSidePanel ? "fixed top-0 right-0 bottom-0 w-full sm:w-[450px] shadow-2xl z-[150] bg-white border-l border-gray-200 flex flex-col transform transition-transform duration-300 animate-in slide-in-from-right-8" : "fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 shadow-2xl backdrop-blur-sm"}>
-      <div className={isSidePanel ? "w-full h-full flex flex-col overflow-hidden" : "bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[85vh]"}>
+    <div className={wrapperClass}>
+      <div className={innerClass}>
         {/* Header */}
         <div className="flex items-center justify-between p-4 bg-gradient-to-r from-purple-600 to-indigo-700 text-white">
           <div className="flex items-center gap-2">
             <Dices size={24} className={isSpinning ? "animate-spin" : ""} />
             <h2 className="text-xl font-bold">Ruleta de Participación</h2>
           </div>
-          <button
-            onClick={onClose}
-            className="p-1 rounded-full hover:bg-white/20 transition-colors"
-            disabled={isSpinning}
-          >
-            <X size={24} />
-          </button>
+          {!isEmbedded && (
+            <button
+              onClick={onClose}
+              className="p-1 rounded-full hover:bg-white/20 transition-colors"
+              disabled={isSpinning}
+            >
+              <X size={24} />
+            </button>
+          )}
         </div>
 
         {/* Content */}

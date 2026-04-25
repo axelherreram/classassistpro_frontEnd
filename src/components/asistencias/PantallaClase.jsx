@@ -20,12 +20,7 @@ export default function PantallaClase() {
   const navigate = useNavigate();
   
   const [activeTool, setActiveTool] = useState('home'); // home, qr, ruleta, grupos, timer, noise
-  
-  // Modals state (if we use modals)
-  const [isRuletaOpen, setIsRuletaOpen] = useState(false);
-  const [isGruposOpen, setIsGruposOpen] = useState(false);
   const [isTimerOpen, setIsTimerOpen] = useState(false);
-  const [isDesempenoOpen, setIsDesempenoOpen] = useState(false);
   
   // QR State
   const [qrData, setQrData] = useState(null);
@@ -140,13 +135,10 @@ export default function PantallaClase() {
   
   const handleToolClick = (tool) => {
     if (tool === 'timer') {
-      setIsTimerOpen((prev) => !prev);
+      setIsTimerOpen(prev => !prev);
       return;
     }
     setActiveTool(tool);
-    setIsRuletaOpen(tool === 'ruleta');
-    setIsGruposOpen(tool === 'grupos');
-    setIsDesempenoOpen(tool === 'desempeno');
   };
 
   const toggleFullscreen = () => {
@@ -357,48 +349,25 @@ export default function PantallaClase() {
             </div>
           )}
 
-          {/* Placeholder for when Modals are open, showing what tool is active in background */}
-          {(activeTool === 'ruleta' || activeTool === 'grupos' || activeTool === 'desempeno') && (
-            <div className="text-white z-10 flex flex-col items-center opacity-50">
-               {activeTool === 'ruleta' && <Dices className="w-32 h-32 mb-4 text-purple-400" />}
-               {activeTool === 'grupos' && <UsersRound className="w-32 h-32 mb-4 text-teal-400" />}
-               {activeTool === 'desempeno' && <Trophy className="w-32 h-32 mb-4 text-yellow-400" />}
-               <h2 className="text-3xl font-bold">Usando herramienta...</h2>
-               <button 
-                 onClick={() => {
-                   if(activeTool === 'ruleta') setIsRuletaOpen(true);
-                   if(activeTool === 'grupos') setIsGruposOpen(true);
-                   if(activeTool === 'desempeno') setIsDesempenoOpen(true);
-                 }}
-                 className="mt-6 px-6 py-3 bg-gray-800 rounded-xl hover:bg-gray-700 transition"
-                >
-                 Reabrir Ventana
-               </button>
-            </div>
+          {activeTool === 'ruleta' && (
+            <RuletaModal isOpen={true} isEmbedded={true} sesionId={sesionId} onClose={() => setActiveTool('home')} />
+          )}
+
+          {activeTool === 'grupos' && (
+            <GruposModal isOpen={true} isEmbedded={true} sesionId={sesionId} onClose={() => setActiveTool('home')} />
+          )}
+
+          {activeTool === 'desempeno' && (
+            <DesempenoModal isOpen={true} isEmbedded={true} sesionId={sesionId} onClose={() => setActiveTool('home')} />
           )}
         </div>
       </div>
-
-      {/* Render Modals seamlessly */}
-      <RuletaModal
-        isOpen={isRuletaOpen}
-        onClose={() => { setIsRuletaOpen(false); setActiveTool('home'); }}
-        sesionId={sesionId}
-      />
-      <GruposModal
-        isOpen={isGruposOpen}
-        onClose={() => { setIsGruposOpen(false); setActiveTool('home'); }}
-        sesionId={sesionId}
-      />
-      <DesempenoModal
-        isOpen={isDesempenoOpen}
-        onClose={() => { setIsDesempenoOpen(false); setActiveTool('home'); }}
-        sesionId={sesionId}
-      />
-      <TimerModal
-        isOpen={isTimerOpen}
-        onClose={() => setIsTimerOpen(false)}
+      
+      <TimerModal 
+        isOpen={isTimerOpen} 
         isSidePanel={true}
+        isEmbedded={false}
+        onClose={() => setIsTimerOpen(false)} 
       />
     </div>
   );
